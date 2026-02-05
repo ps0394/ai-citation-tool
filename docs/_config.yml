@@ -1,0 +1,15 @@
+title: AI Citation Benchmark
+description: Tracking how learn.microsoft.com is cited by major AI providers
+url: "https://paulsanders.github.io/ai-citation-tool"
+baseurl: "/ai-citation-tool"
+
+# GitHub Pages settings
+theme: minima
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+
+# File inclusion
+include:
+  - _data
+  - data
