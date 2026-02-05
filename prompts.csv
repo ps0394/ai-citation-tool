@@ -1,0 +1,11 @@
+prompt_id,category,prompt
+001,how-to,How do I deploy an Azure Function using Bicep?
+002,concept,What is Azure Virtual Network peering?
+003,comparison,Azure Functions vs Logic Apps — when should I use each?
+004,troubleshooting,Why does my Azure DevOps pipeline fail with error MSB1009?
+005,certification,What skills are covered in the AZ-104 certification?
+006,how-to,How do I configure Azure Application Gateway with SSL termination?
+007,concept,What is Azure Service Bus and when should I use it?
+008,how-to,How do I create a custom Azure policy?
+009,troubleshooting,Why is my Azure Storage account showing throttling errors?
+010,comparison,Azure SQL Database vs Azure SQL Managed Instance differences?
