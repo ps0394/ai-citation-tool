@@ -22,6 +22,11 @@ try:
 except ImportError:
     requests = None
 
+try:
+    from openai import OpenAI
+except ImportError:
+    OpenAI = None
+
 # Configuration
 PROMPTS_FILE = "prompts.csv"
 DELAY_BETWEEN_CALLS = 1  # seconds to avoid rate limiting
@@ -100,10 +105,51 @@ def extract_urls_from_text(text: str) -> List[str]:
     url_pattern = r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
     return re.findall(url_pattern, text)
 
+def call_openai(prompt: str, model: str = "gpt-4o-mini", use_web_search: bool = True):
+    """
+    Returns: (response_text, citations_list)
+    Uses the current OpenAI Chat API
+    """
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise RuntimeError("Missing OPENAI_API_KEY (set it in .env)")
+
+    client = OpenAI(api_key=api_key)
+
+    # Use current chat completions API
+    messages = [
+        {"role": "system", "content": "You are a helpful assistant. Please provide accurate information and include citations to authoritative sources when possible."},
+        {"role": "user", "content": prompt}
+    ]
+
+    resp = client.chat.completions.create(
+        model=model,
+        messages=messages,
+        max_tokens=1000
+    )
+
+    # Get response text
+    text = resp.choices[0].message.content or ""
+
+    # Extract URLs from the response text (since current API doesn't return structured citations)
+    citations = extract_urls_from_text(text)
+
+    return text, citations
+
 def call_openai_api(prompt: str) -> Tuple[str, List[str]]:
     """Call OpenAI API (ChatGPT) with web search enabled"""
-    if not OPENAI_API_KEY or not requests:
-        return "API key not configured or requests not available", []
+    if not OPENAI_API_KEY:
+        return "API key not configured", []
+    
+    # Try new OpenAI client first, fall back to requests
+    if OpenAI:
+        try:
+            return call_openai(prompt)
+        except Exception as e:
+            print(f"    New OpenAI client failed, falling back to requests: {e}")
+    
+    if not requests:
+        return "Neither OpenAI client nor requests available", []
     
     headers = {
         "Authorization": f"Bearer {OPENAI_API_KEY}",
