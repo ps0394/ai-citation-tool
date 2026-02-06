@@ -308,7 +308,8 @@
     <!-- Enhanced Prompt Explorer Section -->
     <div class="widget prompt-explorer">
         <h3>📊 Detailed Prompt Analysis</h3>
-        <p>Click on any provider badge to see full responses and citations</p>
+        <p><strong>💡 Instructions:</strong> Click the colored provider badges (ChatGPT, Gemini, Perplexity) to see full AI responses and citations</p>
+        <div id="dataSource" style="padding: 10px; margin: 10px 0; background: #f8f9fa; border-radius: 5px; font-style: italic; color: #666;"></div>
         
         <div class="pagination">
             <button onclick="changePage(-1)" id="prevButton">← Previous</button>
@@ -565,6 +566,7 @@
         const promptsPerPage = 10;
 
         async function loadEnhancedData() {
+            let dataSource = "";
             try {
                 // Try to load JSON file
                 const today = new Date().toISOString().split('T')[0];
@@ -572,9 +574,10 @@
                 
                 // Try today's JSON file first
                 try {
-                    const response = await fetch(`data/results_${today}.json`);
+                    const response = await fetch(`results_${today}.json`);
                     if (response.ok) {
                         jsonData = await response.json();
+                        dataSource = `📁 Loading real data from: results_${today}.json`;
                     }
                 } catch (e) {
                     console.log('Today JSON file not found, trying yesterday...');
@@ -586,9 +589,10 @@
                     yesterday.setDate(yesterday.getDate() - 1);
                     const yesterdayStr = yesterday.toISOString().split('T')[0];
                     try {
-                        const response = await fetch(`data/results_${yesterdayStr}.json`);
+                        const response = await fetch(`results_${yesterdayStr}.json`);
                         if (response.ok) {
                             jsonData = await response.json();
+                            dataSource = `📁 Loading real data from: results_${yesterdayStr}.json`;
                         }
                     } catch (e) {
                         console.log('Yesterday JSON file not found.');
@@ -598,14 +602,17 @@
                 // Use sample data if no real data exists
                 if (!jsonData) {
                     jsonData = createSampleEnhancedData();
+                    dataSource = "🧪 Showing sample data - Run a benchmark to see real results with your API keys";
                 }
                 
                 enhancedData = jsonData;
+                document.getElementById('dataSource').textContent = dataSource;
                 displayEnhancedPrompts();
                 
             } catch (error) {
                 console.error('Error loading enhanced data:', error);
                 enhancedData = createSampleEnhancedData();
+                document.getElementById('dataSource').textContent = "🧪 Showing sample data due to loading error";
                 displayEnhancedPrompts();
             }
         }
@@ -614,7 +621,7 @@
             return {
                 "metadata": {
                     "date": "2026-02-06",
-                    "total_prompts": 3,
+                    "total_prompts": 5,
                     "benchmark_version": "2.0"
                 },
                 "prompts": [
@@ -625,57 +632,181 @@
                         "providers": {
                             "ChatGPT": {
                                 "model": "gpt-4-turbo",
-                                "response_text": "To deploy an Azure Function using Bicep, you need to create a Bicep file that defines the necessary Azure resources including the Function App, hosting plan, and storage account. Here's a comprehensive guide...",
+                                "response_text": "To deploy an Azure Function using Bicep, you need to create a Bicep file that defines the necessary Azure resources including the Function App, hosting plan, and storage account. Here's a comprehensive guide with step-by-step instructions...",
                                 "learn_citations": [
-                                    {
-                                        "url": "https://learn.microsoft.com/azure/azure-functions/",
-                                        "domain": "learn.microsoft.com",
-                                        "title": "Azure Functions Documentation"
-                                    },
-                                    {
-                                        "url": "https://learn.microsoft.com/azure/azure-resource-manager/bicep/",
-                                        "domain": "learn.microsoft.com", 
-                                        "title": "Bicep Language"
-                                    }
+                                    {"url": "https://learn.microsoft.com/azure/azure-functions/", "domain": "learn.microsoft.com", "title": "Azure Functions Documentation"},
+                                    {"url": "https://learn.microsoft.com/azure/azure-resource-manager/bicep/", "domain": "learn.microsoft.com", "title": "Bicep Language"}
                                 ],
                                 "other_citations": [
-                                    {
-                                        "url": "https://github.com/Azure/azure-quickstart-templates",
-                                        "domain": "github.com",
-                                        "title": "Azure Quickstart Templates"
-                                    }
+                                    {"url": "https://github.com/Azure/azure-quickstart-templates", "domain": "github.com", "title": "Azure Quickstart Templates"}
                                 ],
                                 "citation_count": { "learn": 2, "other": 1, "total": 3 }
                             },
                             "Gemini": {
                                 "model": "gemini-pro",
-                                "response_text": "Azure Functions can be deployed using Bicep by defining infrastructure as code. This approach provides consistency and repeatability...",
+                                "response_text": "Azure Functions can be deployed using Bicep by defining infrastructure as code. This approach provides consistency and repeatability for your serverless applications...",
                                 "learn_citations": [
-                                    {
-                                        "url": "https://learn.microsoft.com/azure/azure-functions/functions-infrastructure-as-code",
-                                        "domain": "learn.microsoft.com",
-                                        "title": "Infrastructure As Code"
-                                    }
+                                    {"url": "https://learn.microsoft.com/azure/azure-functions/functions-infrastructure-as-code", "domain": "learn.microsoft.com", "title": "Infrastructure As Code"}
                                 ],
                                 "other_citations": [],
                                 "citation_count": { "learn": 1, "other": 0, "total": 1 }
                             },
                             "Perplexity": {
                                 "model": "llama-3.1-sonar-small-128k-online",
-                                "response_text": "Bicep is Microsoft's domain-specific language for deploying Azure resources. For Azure Functions, you'll need to define several components...",
+                                "response_text": "Bicep is Microsoft's domain-specific language for deploying Azure resources. For Azure Functions, you'll need to define several components including the Function App, App Service Plan, and supporting resources...",
                                 "learn_citations": [
-                                    {
-                                        "url": "https://learn.microsoft.com/azure/azure-resource-manager/bicep/overview",
-                                        "domain": "learn.microsoft.com",
-                                        "title": "Bicep Overview"
-                                    }
+                                    {"url": "https://learn.microsoft.com/azure/azure-resource-manager/bicep/overview", "domain": "learn.microsoft.com", "title": "Bicep Overview"}
                                 ],
                                 "other_citations": [
-                                    {
-                                        "url": "https://techcommunity.microsoft.com/blog/",
-                                        "domain": "techcommunity.microsoft.com",
-                                        "title": "Microsoft Tech Community"
-                                    }
+                                    {"url": "https://techcommunity.microsoft.com/blog/", "domain": "techcommunity.microsoft.com", "title": "Microsoft Tech Community"}
+                                ],
+                                "citation_count": { "learn": 1, "other": 1, "total": 2 }
+                            }
+                        }
+                    },
+                    {
+                        "prompt_id": "002", 
+                        "prompt_text": "What is Azure Virtual Network peering?",
+                        "category": "concept",
+                        "providers": {
+                            "ChatGPT": {
+                                "model": "gpt-4-turbo",
+                                "response_text": "Azure Virtual Network peering allows you to connect two Azure virtual networks seamlessly. The networks appear as one for connectivity purposes. Traffic between virtual networks uses the Microsoft backbone infrastructure...",
+                                "learn_citations": [
+                                    {"url": "https://learn.microsoft.com/azure/virtual-network/virtual-network-peering-overview", "domain": "learn.microsoft.com", "title": "VNet Peering Overview"}
+                                ],
+                                "other_citations": [],
+                                "citation_count": { "learn": 1, "other": 0, "total": 1 }
+                            },
+                            "Gemini": {
+                                "model": "gemini-pro", 
+                                "response_text": "Virtual Network peering in Azure enables you to connect VNets in the same region or across regions. This connectivity allows resources in different VNets to communicate with each other...",
+                                "learn_citations": [
+                                    {"url": "https://learn.microsoft.com/azure/virtual-network/virtual-network-peering-overview", "domain": "learn.microsoft.com", "title": "Virtual Network Peering"}
+                                ],
+                                "other_citations": [
+                                    {"url": "https://azure.microsoft.com/pricing/details/virtual-network/", "domain": "azure.microsoft.com", "title": "VNet Pricing"}
+                                ],
+                                "citation_count": { "learn": 1, "other": 1, "total": 2 }
+                            },
+                            "Perplexity": {
+                                "model": "llama-3.1-sonar-small-128k-online",
+                                "response_text": "Azure VNet peering is a networking feature that connects two or more virtual networks, making them appear as a single network for connectivity purposes...",
+                                "learn_citations": [
+                                    {"url": "https://learn.microsoft.com/azure/virtual-network/", "domain": "learn.microsoft.com", "title": "Virtual Network Documentation"}
+                                ],
+                                "other_citations": [],
+                                "citation_count": { "learn": 1, "other": 0, "total": 1 }
+                            }
+                        }
+                    },
+                    {
+                        "prompt_id": "003",
+                        "prompt_text": "Azure Functions vs Logic Apps — when should I use each?",
+                        "category": "comparison", 
+                        "providers": {
+                            "ChatGPT": {
+                                "model": "gpt-4-turbo",
+                                "response_text": "Azure Functions and Logic Apps serve different purposes in the Azure ecosystem. Functions are best for code-centric solutions, while Logic Apps excel at workflow orchestration. Here's when to use each...",
+                                "learn_citations": [
+                                    {"url": "https://learn.microsoft.com/azure/azure-functions/", "domain": "learn.microsoft.com", "title": "Azure Functions Overview"},
+                                    {"url": "https://learn.microsoft.com/azure/logic-apps/", "domain": "learn.microsoft.com", "title": "Azure Logic Apps"}
+                                ],
+                                "other_citations": [],
+                                "citation_count": { "learn": 2, "other": 0, "total": 2 }
+                            },
+                            "Gemini": {
+                                "model": "gemini-pro",
+                                "response_text": "Choose Azure Functions for event-driven programming and custom code execution. Logic Apps are ideal for business process automation and integration scenarios...",
+                                "learn_citations": [
+                                    {"url": "https://learn.microsoft.com/azure/logic-apps/logic-apps-overview", "domain": "learn.microsoft.com", "title": "Logic Apps Overview"}
+                                ],
+                                "other_citations": [],
+                                "citation_count": { "learn": 1, "other": 0, "total": 1 }
+                            },
+                            "Perplexity": {
+                                "model": "llama-3.1-sonar-small-128k-online",
+                                "response_text": "The choice between Azure Functions and Logic Apps depends on your specific use case. Functions are serverless compute solutions, while Logic Apps are workflow orchestration services...",
+                                "learn_citations": [
+                                    {"url": "https://learn.microsoft.com/azure/azure-functions/functions-compare-logic-apps-ms-flow-webjobs", "domain": "learn.microsoft.com", "title": "Compare Functions Logic Apps"}
+                                ],
+                                "other_citations": [
+                                    {"url": "https://stackoverflow.com/questions/tagged/azure-functions", "domain": "stackoverflow.com", "title": "Azure Functions Stack Overflow"}
+                                ],
+                                "citation_count": { "learn": 1, "other": 1, "total": 2 }
+                            }
+                        }
+                    },
+                    {
+                        "prompt_id": "004",
+                        "prompt_text": "Why does my Azure DevOps pipeline fail with error MSB1009?",
+                        "category": "troubleshooting",
+                        "providers": {
+                            "ChatGPT": {
+                                "model": "gpt-4-turbo", 
+                                "response_text": "MSB1009 error indicates that a project file was not found. This commonly occurs in Azure DevOps pipelines when the build agent can't locate the specified .csproj or .sln file. Here are the troubleshooting steps...",
+                                "learn_citations": [
+                                    {"url": "https://learn.microsoft.com/azure/devops/pipelines/troubleshooting/", "domain": "learn.microsoft.com", "title": "Pipeline Troubleshooting"}
+                                ],
+                                "other_citations": [
+                                    {"url": "https://github.com/Microsoft/azure-pipelines-tasks/issues/", "domain": "github.com", "title": "Azure Pipelines Tasks Issues"}
+                                ],
+                                "citation_count": { "learn": 1, "other": 1, "total": 2 }
+                            },
+                            "Gemini": {
+                                "model": "gemini-pro",
+                                "response_text": "Error MSB1009 typically means the build system cannot find the project file. Check your pipeline working directory and ensure the path to your project file is correct...",
+                                "learn_citations": [
+                                    {"url": "https://learn.microsoft.com/azure/devops/pipelines/build/", "domain": "learn.microsoft.com", "title": "Build Pipelines"}
+                                ],
+                                "other_citations": [],
+                                "citation_count": { "learn": 1, "other": 0, "total": 1 }
+                            },
+                            "Perplexity": {
+                                "model": "llama-3.1-sonar-small-128k-online",
+                                "response_text": "MSB1009 is a MSBuild error indicating missing project files. In Azure DevOps context, verify your repository structure and pipeline working directory configuration...",
+                                "learn_citations": [
+                                    {"url": "https://learn.microsoft.com/visualstudio/msbuild/", "domain": "learn.microsoft.com", "title": "MSBuild Documentation"}
+                                ],
+                                "other_citations": [
+                                    {"url": "https://docs.microsoft.com/troubleshoot/", "domain": "learn.microsoft.com", "title": "Microsoft Troubleshooting"}
+                                ],
+                                "citation_count": { "learn": 2, "other": 0, "total": 2 }
+                            }
+                        }
+                    },
+                    {
+                        "prompt_id": "005",
+                        "prompt_text": "What skills are covered in the AZ-104 certification?",
+                        "category": "certification",
+                        "providers": {
+                            "ChatGPT": {
+                                "model": "gpt-4-turbo",
+                                "response_text": "The AZ-104 Microsoft Azure Administrator certification covers essential skills for Azure administrators including identity management, governance, storage, compute, and virtual networking...",
+                                "learn_citations": [
+                                    {"url": "https://learn.microsoft.com/certifications/azure-administrator/", "domain": "learn.microsoft.com", "title": "AZ-104 Certification"},
+                                    {"url": "https://learn.microsoft.com/certifications/exams/az-104", "domain": "learn.microsoft.com", "title": "AZ-104 Exam Details"}
+                                ],
+                                "other_citations": [],
+                                "citation_count": { "learn": 2, "other": 0, "total": 2 }
+                            },
+                            "Gemini": {
+                                "model": "gemini-pro",
+                                "response_text": "AZ-104 focuses on Azure administration fundamentals including managing Azure identities, implementing storage solutions, deploying VMs, configuring virtual networks, and monitoring Azure resources...",
+                                "learn_citations": [
+                                    {"url": "https://learn.microsoft.com/azure/", "domain": "learn.microsoft.com", "title": "Azure Documentation"}
+                                ],
+                                "other_citations": [],
+                                "citation_count": { "learn": 1, "other": 0, "total": 1 }
+                            },
+                            "Perplexity": {
+                                "model": "llama-3.1-sonar-small-128k-online",
+                                "response_text": "The AZ-104 exam tests your ability to manage Azure subscriptions and resources, implement and manage storage, deploy and manage Azure compute resources, configure and manage virtual networking, and monitor and back up Azure resources...",
+                                "learn_citations": [
+                                    {"url": "https://learn.microsoft.com/certifications/azure-administrator/", "domain": "learn.microsoft.com", "title": "Azure Administrator Certification"}
+                                ],
+                                "other_citations": [
+                                    {"url": "https://azure.microsoft.com/certifications/", "domain": "azure.microsoft.com", "title": "Azure Certifications"}
                                 ],
                                 "citation_count": { "learn": 1, "other": 1, "total": 2 }
                             }
