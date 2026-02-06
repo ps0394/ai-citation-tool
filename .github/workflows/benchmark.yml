@@ -63,5 +63,13 @@ jobs:
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         git add docs/data/
-        git diff --staged --quiet || git commit -m "Update benchmark results $(date)"
+        if git diff --staged --quiet; then
+          echo "No changes to commit"
+          # Force refresh by touching a file if no changes detected
+          echo "# Updated: $(date)" >> docs/data/.timestamp
+          git add docs/data/.timestamp
+          git commit -m "Update benchmark results $(date)" || echo "Nothing to commit"
+        else
+          git commit -m "Update benchmark results $(date)"
+        fi
         git push
