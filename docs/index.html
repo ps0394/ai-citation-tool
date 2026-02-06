@@ -201,28 +201,69 @@
             try {
                 // Try to load the latest CSV file
                 const today = new Date().toISOString().split('T')[0];
-                const response = await fetch(`data/results_${today}.csv`);
+                let csvText = null;
                 
-                if (!response.ok) {
-                    // Try yesterday's file if today's doesn't exist
+                // Try today's file first
+                try {
+                    const response = await fetch(`data/results_${today}.csv`);
+                    if (response.ok) {
+                        csvText = await response.text();
+                    }
+                } catch (e) {
+                    console.log('Today file not found, trying yesterday...');
+                }
+                
+                // Try yesterday's file if today's doesn't exist
+                if (!csvText) {
                     const yesterday = new Date();
                     yesterday.setDate(yesterday.getDate() - 1);
                     const yesterdayStr = yesterday.toISOString().split('T')[0];
-                    const response2 = await fetch(`data/results_${yesterdayStr}.csv`);
-                    
-                    if (response2.ok) {
-                        const csvText = await response2.text();
-                        parseAndDisplayResults(csvText);
-                    } else {
-                        showStatus('info', 'No recent results found. Run a benchmark to generate data.');
+                    try {
+                        const response = await fetch(`data/results_${yesterdayStr}.csv`);
+                        if (response.ok) {
+                            csvText = await response.text();
+                        }
+                    } catch (e) {
+                        console.log('Yesterday file not found, trying sample...');
                     }
-                } else {
-                    const csvText = await response.text();
-                    parseAndDisplayResults(csvText);
                 }
+                
+                // Try sample data if no real data exists
+                if (!csvText) {
+                    try {
+                        const response = await fetch('data/sample-results.csv');
+                        if (response.ok) {
+                            csvText = await response.text();
+                            showStatus('info', 'Showing sample data. Run a benchmark to see real results.');
+                        }
+                    } catch (e) {
+                        console.log('Sample file not found either');
+                    }
+                }
+                
+                if (csvText) {
+                    parseAndDisplayResults(csvText);
+                } else {
+                    // Show hardcoded sample data if no files are available
+                    const sampleData = `date,provider,model,prompt_id,prompt,response,citation_url,citation_domain
+2026-02-06,ChatGPT,gpt-4o-mini,001,How do I deploy an Azure Function using Bicep?,"To deploy an Azure Function using Bicep, you need to define the necessary resources...",https://learn.microsoft.com/azure/azure-functions/,learn.microsoft.com
+2026-02-06,ChatGPT,gpt-4o-mini,001,How do I deploy an Azure Function using Bicep?,"To deploy an Azure Function using Bicep, you need to define the necessary resources...",https://learn.microsoft.com/azure/azure-resource-manager/bicep/,learn.microsoft.com
+2026-02-06,Gemini,gemini-pro,001,How do I deploy an Azure Function using Bicep?,"Based on official documentation...",https://learn.microsoft.com/en-us/azure/,learn.microsoft.com
+2026-02-06,Gemini,gemini-pro,001,How do I deploy an Azure Function using Bicep?,"Based on official documentation...",https://cloud.google.com/docs/,cloud.google.com
+2026-02-06,Perplexity,llama-3.1-sonar-small-128k-online,001,How do I deploy an Azure Function using Bicep?,"According to multiple sources including Microsoft Learn...",https://learn.microsoft.com/azure/azure-functions/,learn.microsoft.com
+2026-02-06,Perplexity,llama-3.1-sonar-small-128k-online,001,How do I deploy an Azure Function using Bicep?,"According to multiple sources including Microsoft Learn...",https://github.com/Azure/azure-quickstart-templates,github.com
+2026-02-06,ChatGPT,gpt-4o-mini,002,What is Azure Virtual Network peering?,"Azure Virtual Network peering enables connectivity...",https://learn.microsoft.com/azure/virtual-network/,learn.microsoft.com
+2026-02-06,ChatGPT,gpt-4o-mini,002,What is Azure Virtual Network peering?,"Azure Virtual Network peering enables connectivity...",https://stackoverflow.com/questions/azure-vnet,stackoverflow.com
+2026-02-06,Gemini,gemini-pro,002,What is Azure Virtual Network peering?,"Based on Microsoft documentation...",https://learn.microsoft.com/en-us/azure/,learn.microsoft.com
+2026-02-06,Perplexity,llama-3.1-sonar-small-128k-online,002,What is Azure Virtual Network peering?,"According to official sources...",https://docs.microsoft.com/azure/,learn.microsoft.com`;
+                    
+                    parseAndDisplayResults(sampleData);
+                    showStatus('info', 'Showing demo data. Real benchmark results will appear here once GitHub Actions runs successfully.');
+                }
+                
             } catch (error) {
                 console.error('Error loading results:', error);
-                showStatus('info', 'No results files found. Run a benchmark to generate data.');
+                showStatus('error', 'Error loading benchmark results. Check browser console for details.');
             }
         }
 
