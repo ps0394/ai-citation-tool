@@ -60,6 +60,45 @@ def normalize_domain(url: str) -> str:
     except:
         return ""
 
+def categorize_citations(citations: List[str]) -> Dict[str, List[Dict[str, str]]]:
+    """Categorize citations into Learn vs Other with metadata"""
+    learn_citations = []
+    other_citations = []
+    
+    for url in citations:
+        if not url or url in ['NONE', 'ERROR']:
+            continue
+            
+        domain = normalize_domain(url)
+        citation_data = {
+            "url": url,
+            "domain": domain,
+            "title": extract_title_from_url(url)
+        }
+        
+        if domain == "learn.microsoft.com":
+            learn_citations.append(citation_data)
+        else:
+            other_citations.append(citation_data)
+    
+    return {
+        "learn": learn_citations,
+        "other": other_citations
+    }
+
+def extract_title_from_url(url: str) -> str:
+    """Extract a readable title from URL (simple heuristic)"""
+    try:
+        # Remove protocol and extract the path
+        path = urlparse(url).path
+        # Get the last part of the path and clean it up
+        title = path.split('/')[-1] or path.split('/')[-2]
+        # Replace hyphens with spaces and capitalize
+        title = title.replace('-', ' ').replace('_', ' ').title()
+        return title if title else "Documentation Link"
+    except:
+        return "Documentation Link"
+
 def call_stub_chatgpt(prompt: str) -> Tuple[str, List[str]]:
     """Stub implementation for ChatGPT"""
     citations = [
@@ -285,13 +324,34 @@ def call_perplexity_api(prompt: str) -> Tuple[str, List[str]]:
         return f"Error: {str(e)}", []
 
 def write_results_to_csv(results: List[Dict], output_file: str):
-    """Write results to CSV file"""
+    """Write results to CSV file (legacy format for existing dashboard)"""
     fieldnames = ['date', 'provider', 'model', 'prompt_id', 'prompt', 'response', 'citation_url', 'citation_domain']
     
     with open(output_file, 'w', newline='', encoding='utf-8') as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(results)
+
+def write_results_to_json(enhanced_results: Dict, output_file: str):
+    """Write enhanced results to JSON file"""
+    json_file = output_file.replace('.csv', '.json')
+    
+    with open(json_file, 'w', encoding='utf-8') as f:
+        json.dump(enhanced_results, f, indent=2, ensure_ascii=False)
+    
+    print(f"Enhanced results written to: {json_file}")
+
+def create_enhanced_results_structure(prompts: List[Dict], timestamp: str) -> Dict:
+    """Create the enhanced JSON structure for detailed results"""
+    return {
+        "metadata": {
+            "date": timestamp,
+            "timestamp": datetime.now().isoformat(),
+            "total_prompts": len(prompts),
+            "benchmark_version": "2.0"
+        },
+        "prompts": []
+    }
 
 def run_benchmark(dry_run=False):
     """Main benchmark runner"""
@@ -314,7 +374,10 @@ def run_benchmark(dry_run=False):
     timestamp = datetime.now().strftime("%Y-%m-%d")
     output_file = f"results_{timestamp}.csv"
     
-    results = []
+    # Initialize both legacy and enhanced results
+    results = []  # Legacy CSV format
+    enhanced_results = create_enhanced_results_structure(prompts, timestamp)
+    
     total_calls = len(prompts) * 3  # 3 providers
     current_call = 0
     
@@ -335,8 +398,17 @@ def run_benchmark(dry_run=False):
     for prompt_data in prompts:
         prompt_id = prompt_data['prompt_id']
         prompt_text = prompt_data['prompt']
+        category = prompt_data.get('category', 'general')
         
         print(f"\nProcessing prompt {prompt_id}: {prompt_text[:60]}...")
+        
+        # Enhanced JSON structure for this prompt
+        enhanced_prompt_data = {
+            "prompt_id": prompt_id,
+            "prompt_text": prompt_text,
+            "category": category,
+            "providers": {}
+        }
         
         for provider_name, model, api_function in providers:
             current_call += 1
@@ -345,6 +417,23 @@ def run_benchmark(dry_run=False):
             try:
                 response_text, citations = api_function(prompt_text)
                 
+                # Categorize citations for enhanced JSON
+                categorized_citations = categorize_citations(citations)
+                
+                # Enhanced provider data
+                enhanced_prompt_data["providers"][provider_name] = {
+                    "model": model,
+                    "response_text": response_text,
+                    "learn_citations": categorized_citations["learn"],
+                    "other_citations": categorized_citations["other"],
+                    "citation_count": {
+                        "learn": len(categorized_citations["learn"]),
+                        "other": len(categorized_citations["other"]),
+                        "total": len(categorized_citations["learn"]) + len(categorized_citations["other"])
+                    }
+                }
+                
+                # Legacy CSV format (for backward compatibility)
                 if citations:
                     # One row per citation
                     for citation in citations:
@@ -355,19 +444,19 @@ def run_benchmark(dry_run=False):
                             'model': model,
                             'prompt_id': prompt_id,
                             'prompt': prompt_text,
-                            'response': response_text,
+                            'response': response_text[:500] + "..." if len(response_text) > 500 else response_text,  # Truncate for CSV
                             'citation_url': citation,
                             'citation_domain': domain
                         })
                 else:
-                    # No citations
+                    # No citations for legacy CSV
                     results.append({
                         'date': timestamp,
                         'provider': provider_name,
                         'model': model,
                         'prompt_id': prompt_id,
                         'prompt': prompt_text,
-                        'response': response_text,
+                        'response': response_text[:500] + "..." if len(response_text) > 500 else response_text,
                         'citation_url': 'NONE',
                         'citation_domain': 'NONE'
                     })
@@ -378,30 +467,59 @@ def run_benchmark(dry_run=False):
                     
             except Exception as e:
                 print(f"    Error calling {provider_name}: {str(e)}")
-                # Record the error
+                
+                # Record error in both formats
+                error_response = f"ERROR: {str(e)}"
+                
+                # Enhanced format
+                enhanced_prompt_data["providers"][provider_name] = {
+                    "model": model,
+                    "response_text": error_response,
+                    "learn_citations": [],
+                    "other_citations": [],
+                    "citation_count": {"learn": 0, "other": 0, "total": 0},
+                    "error": str(e)
+                }
+                
+                # Legacy CSV format
                 results.append({
                     'date': timestamp,
                     'provider': provider_name,
                     'model': model,
                     'prompt_id': prompt_id,
                     'prompt': prompt_text,
-                    'response': f"ERROR: {str(e)}",
+                    'response': error_response,
                     'citation_url': 'ERROR',
                     'citation_domain': 'ERROR'
                 })
+        
+        # Add this prompt's data to enhanced results
+        enhanced_results["prompts"].append(enhanced_prompt_data)
     
-    # Write results
+    # Write both formats
     write_results_to_csv(results, output_file)
+    write_results_to_json(enhanced_results, output_file)
+    
     print(f"\nBenchmark complete! Results written to: {output_file}")
     print(f"Total results: {len(results)} rows")
     
-    # Quick summary
-    learn_citations = sum(1 for r in results if r['citation_domain'] == 'learn.microsoft.com')
-    total_citations = sum(1 for r in results if r['citation_url'] not in ['NONE', 'ERROR'])
+    # Enhanced summary from JSON data
+    total_learn = sum(
+        prompt_data["providers"][provider]["citation_count"]["learn"]
+        for prompt_data in enhanced_results["prompts"]
+        for provider in prompt_data["providers"]
+    )
+    total_other = sum(
+        prompt_data["providers"][provider]["citation_count"]["other"] 
+        for prompt_data in enhanced_results["prompts"]
+        for provider in prompt_data["providers"]
+    )
+    total_citations = total_learn + total_other
     
     if total_citations > 0:
-        learn_percentage = (learn_citations / total_citations) * 100
-        print(f"Learn.microsoft.com citations: {learn_citations}/{total_citations} ({learn_percentage:.1f}%)")
+        learn_percentage = (total_learn / total_citations) * 100
+        print(f"Learn.microsoft.com citations: {total_learn}/{total_citations} ({learn_percentage:.1f}%)")
+        print(f"Other citations: {total_other}/{total_citations} ({100-learn_percentage:.1f}%)")
     else:
         print("No citations found in responses.")
 
