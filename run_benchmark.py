@@ -118,8 +118,8 @@ def call_openai(prompt: str, model: str = "gpt-4o-mini", use_web_search: bool = 
 
     # Use current chat completions API
     messages = [
-        {"role": "system", "content": "You are a helpful assistant. Please provide accurate information and include citations to authoritative sources when possible."},
-        {"role": "user", "content": prompt}
+        {"role": "system", "content": "You are a helpful assistant. Please provide accurate information and include citations with source URLs when possible. Format URLs clearly in your response."},
+        {"role": "user", "content": f"{prompt} Please include relevant source URLs and documentation links in your response."}
     ]
 
     resp = client.chat.completions.create(
