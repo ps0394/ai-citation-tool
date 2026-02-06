@@ -52,8 +52,9 @@ jobs:
     - name: Archive results
       run: |
         mkdir -p docs/data
-        ls -la results_*.csv || echo "No results files found in current directory"
-        cp results_*.csv docs/data/ 2>/dev/null || echo "Copy failed - checking directory contents"
+        ls -la results_*.csv results_*.json || echo "No results files found in current directory"
+        cp results_*.csv docs/data/ 2>/dev/null || echo "CSV copy failed - checking directory contents"
+        cp results_*.json docs/data/ 2>/dev/null || echo "JSON copy failed - checking directory contents"
         ls -la docs/data/ || echo "docs/data directory issues"
         echo "Files in docs/data:"
         ls -la docs/data/ || true

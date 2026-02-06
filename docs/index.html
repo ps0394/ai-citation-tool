@@ -574,10 +574,10 @@
                 
                 // Try today's JSON file first
                 try {
-                    const response = await fetch(`results_${today}.json`);
+                    const response = await fetch(`data/results_${today}.json`);
                     if (response.ok) {
                         jsonData = await response.json();
-                        dataSource = `📁 Loading real data from: results_${today}.json`;
+                        dataSource = `📁 Loading real data from: data/results_${today}.json`;
                     }
                 } catch (e) {
                     console.log('Today JSON file not found, trying yesterday...');
@@ -589,10 +589,10 @@
                     yesterday.setDate(yesterday.getDate() - 1);
                     const yesterdayStr = yesterday.toISOString().split('T')[0];
                     try {
-                        const response = await fetch(`results_${yesterdayStr}.json`);
+                        const response = await fetch(`data/results_${yesterdayStr}.json`);
                         if (response.ok) {
                             jsonData = await response.json();
-                            dataSource = `📁 Loading real data from: results_${yesterdayStr}.json`;
+                            dataSource = `📁 Loading real data from: data/results_${yesterdayStr}.json`;
                         }
                     } catch (e) {
                         console.log('Yesterday JSON file not found.');
