@@ -119,27 +119,36 @@ def call_openai(prompt: str, model: str = "gpt-4o-mini", use_web_search: bool = 
 
     client = OpenAI(api_key=api_key)
 
-client = OpenAI(api_key=api_key)
-
     # Use current chat completions API
     messages = [
         {"role": "system", "content": "You are a helpful assistant. Please provide accurate information and include citations with source URLs when possible. Format URLs clearly in your response."},
         {"role": "user", "content": f"{prompt} Please include relevant source URLs and documentation links in your response."}
     ]
 
-    resp = client.chat.completions.create(
-        model=model,
-        messages=messages,
-        max_tokens=1000
-    )
+    try:
+        print(f"[DEBUG] Calling OpenAI API...")
+        resp = client.chat.completions.create(
+            model=model,
+            messages=messages,
+            max_tokens=1000
+        )
+        print(f"[DEBUG] OpenAI API call successful")
 
-    # Get response text
-    text = resp.choices[0].message.content or ""
+        # Get response text
+        text = resp.choices[0].message.content or ""
+        print(f"[DEBUG] Response length: {len(text)} characters")
+        print(f"[DEBUG] Response preview: {text[:100]}...")
 
-    # Extract URLs from the response text (since current API doesn't return structured citations)
-    citations = extract_urls_from_text(text)
+        # Extract URLs from the response text (since current API doesn't return structured citations)
+        citations = extract_urls_from_text(text)
+        print(f"[DEBUG] Extracted {len(citations)} citations: {citations}")
 
-    return text, citations
+        return text, citations
+        
+    except Exception as e:
+        print(f"[DEBUG] OpenAI API call failed: {e}")
+        print(f"[DEBUG] Full error details: {repr(e)}")
+        return f"Error calling OpenAI: {e}", []
 
 def call_openai_api(prompt: str) -> Tuple[str, List[str]]:
     """Call OpenAI API (ChatGPT) with web search enabled"""
