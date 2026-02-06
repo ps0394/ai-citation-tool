@@ -110,11 +110,14 @@ def call_openai(prompt: str, model: str = "gpt-4o-mini", use_web_search: bool = 
     Returns: (response_text, citations_list)
     Uses the current OpenAI Chat API
     """
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        raise RuntimeError("Missing OPENAI_API_KEY (set it in .env)")
+  api_key = os.getenv("OPENAI_API_KEY")
+if not api_key:
+    raise RuntimeError("Missing OPENAI_API_KEY (set it in .env)")
 
-    client = OpenAI(api_key=api_key)
+print(f"[DEBUG] Making OpenAI API call with model: {model}")
+print(f"[DEBUG] API key present: {bool(api_key)} (ends with: {api_key[-6:] if api_key else 'None'})")
+
+client = OpenAI(api_key=api_key)
 
     # Use current chat completions API
     messages = [
