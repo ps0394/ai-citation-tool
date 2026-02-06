@@ -1,0 +1,31 @@
+date,provider,model,prompt_id,prompt,response,citation_url,citation_domain
+2026-02-06,ChatGPT,gpt-4-turbo,001,How do I deploy an Azure Function using Bicep?,API key not configured,NONE,NONE
+2026-02-06,Gemini,gemini-pro,001,How do I deploy an Azure Function using Bicep?,API key not configured or requests not available,NONE,NONE
+2026-02-06,Perplexity,llama-3.1-sonar-small-128k-online,001,How do I deploy an Azure Function using Bicep?,API key not configured or requests not available,NONE,NONE
+2026-02-06,ChatGPT,gpt-4-turbo,002,What is Azure Virtual Network peering?,API key not configured,NONE,NONE
+2026-02-06,Gemini,gemini-pro,002,What is Azure Virtual Network peering?,API key not configured or requests not available,NONE,NONE
+2026-02-06,Perplexity,llama-3.1-sonar-small-128k-online,002,What is Azure Virtual Network peering?,API key not configured or requests not available,NONE,NONE
+2026-02-06,ChatGPT,gpt-4-turbo,003,Azure Functions vs Logic Apps — when should I use each?,API key not configured,NONE,NONE
+2026-02-06,Gemini,gemini-pro,003,Azure Functions vs Logic Apps — when should I use each?,API key not configured or requests not available,NONE,NONE
+2026-02-06,Perplexity,llama-3.1-sonar-small-128k-online,003,Azure Functions vs Logic Apps — when should I use each?,API key not configured or requests not available,NONE,NONE
+2026-02-06,ChatGPT,gpt-4-turbo,004,Why does my Azure DevOps pipeline fail with error MSB1009?,API key not configured,NONE,NONE
+2026-02-06,Gemini,gemini-pro,004,Why does my Azure DevOps pipeline fail with error MSB1009?,API key not configured or requests not available,NONE,NONE
+2026-02-06,Perplexity,llama-3.1-sonar-small-128k-online,004,Why does my Azure DevOps pipeline fail with error MSB1009?,API key not configured or requests not available,NONE,NONE
+2026-02-06,ChatGPT,gpt-4-turbo,005,What skills are covered in the AZ-104 certification?,API key not configured,NONE,NONE
+2026-02-06,Gemini,gemini-pro,005,What skills are covered in the AZ-104 certification?,API key not configured or requests not available,NONE,NONE
+2026-02-06,Perplexity,llama-3.1-sonar-small-128k-online,005,What skills are covered in the AZ-104 certification?,API key not configured or requests not available,NONE,NONE
+2026-02-06,ChatGPT,gpt-4-turbo,006,How do I configure Azure Application Gateway with SSL termination?,API key not configured,NONE,NONE
+2026-02-06,Gemini,gemini-pro,006,How do I configure Azure Application Gateway with SSL termination?,API key not configured or requests not available,NONE,NONE
+2026-02-06,Perplexity,llama-3.1-sonar-small-128k-online,006,How do I configure Azure Application Gateway with SSL termination?,API key not configured or requests not available,NONE,NONE
+2026-02-06,ChatGPT,gpt-4-turbo,007,What is Azure Service Bus and when should I use it?,API key not configured,NONE,NONE
+2026-02-06,Gemini,gemini-pro,007,What is Azure Service Bus and when should I use it?,API key not configured or requests not available,NONE,NONE
+2026-02-06,Perplexity,llama-3.1-sonar-small-128k-online,007,What is Azure Service Bus and when should I use it?,API key not configured or requests not available,NONE,NONE
+2026-02-06,ChatGPT,gpt-4-turbo,008,How do I create a custom Azure policy?,API key not configured,NONE,NONE
+2026-02-06,Gemini,gemini-pro,008,How do I create a custom Azure policy?,API key not configured or requests not available,NONE,NONE
+2026-02-06,Perplexity,llama-3.1-sonar-small-128k-online,008,How do I create a custom Azure policy?,API key not configured or requests not available,NONE,NONE
+2026-02-06,ChatGPT,gpt-4-turbo,009,Why is my Azure Storage account showing throttling errors?,API key not configured,NONE,NONE
+2026-02-06,Gemini,gemini-pro,009,Why is my Azure Storage account showing throttling errors?,API key not configured or requests not available,NONE,NONE
+2026-02-06,Perplexity,llama-3.1-sonar-small-128k-online,009,Why is my Azure Storage account showing throttling errors?,API key not configured or requests not available,NONE,NONE
+2026-02-06,ChatGPT,gpt-4-turbo,010,Azure SQL Database vs Azure SQL Managed Instance differences?,API key not configured,NONE,NONE
+2026-02-06,Gemini,gemini-pro,010,Azure SQL Database vs Azure SQL Managed Instance differences?,API key not configured or requests not available,NONE,NONE
+2026-02-06,Perplexity,llama-3.1-sonar-small-128k-online,010,Azure SQL Database vs Azure SQL Managed Instance differences?,API key not configured or requests not available,NONE,NONE
