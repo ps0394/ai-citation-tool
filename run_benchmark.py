@@ -268,9 +268,22 @@ def call_gemini_api(prompt: str) -> Tuple[str, List[str]]:
     }
     
     try:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={GEMINI_API_KEY}"
+        # Try the updated Gemini 1.5 model first
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={GEMINI_API_KEY}"
         print(f"[DEBUG] Making request to: {url[:80]}...")
         response = requests.post(url, headers=headers, json=data, timeout=30)
+        
+        # If that fails with 404, try the older model name
+        if response.status_code == 404:
+            print(f"[DEBUG] Gemini 1.5 model not found, trying gemini-pro...")
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={GEMINI_API_KEY}"
+            response = requests.post(url, headers=headers, json=data, timeout=30)
+        
+        # If still 404, try the alternative endpoint
+        if response.status_code == 404:
+            print(f"[DEBUG] Standard endpoint failed, trying alternative...")
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
+            response = requests.post(url, headers=headers, json=data, timeout=30)
         
         print(f"[DEBUG] Gemini API response status: {response.status_code}")
         
@@ -423,13 +436,13 @@ def run_benchmark(dry_run=False):
     if dry_run:
         providers = [
             ("ChatGPT", "gpt-4-turbo", call_stub_chatgpt),
-            ("Gemini", "gemini-pro", call_stub_gemini),
+            ("Gemini", "gemini-1.5-flash", call_stub_gemini),
             ("Perplexity", "llama-3.1-sonar-small-128k-online", call_stub_perplexity)
         ]
     else:
         providers = [
             ("ChatGPT", "gpt-4-turbo", call_openai_api),
-            ("Gemini", "gemini-pro", call_gemini_api),
+            ("Gemini", "gemini-1.5-flash", call_gemini_api),
             ("Perplexity", "llama-3.1-sonar-small-128k-online", call_perplexity_api)
         ]
     
