@@ -239,9 +239,34 @@ def call_openai_api(prompt: str) -> Tuple[str, List[str]]:
     except Exception as e:
         return f"Error: {str(e)}", []
 
+def list_gemini_models() -> List[str]:
+    """List available Gemini models to debug which ones actually exist"""
+    if not GEMINI_API_KEY or not requests:
+        return []
+    
+    try:
+        # Try both v1 and v1beta endpoints
+        for api_version in ['v1', 'v1beta']:
+            url = f"https://generativelanguage.googleapis.com/{api_version}/models?key={GEMINI_API_KEY}"
+            print(f"[DEBUG] Checking available models at: {url[:70]}...")
+            
+            response = requests.get(url, timeout=15)
+            if response.status_code == 200:
+                result = response.json()
+                models = [model.get('name', '') for model in result.get('models', [])]
+                print(f"[DEBUG] Available {api_version} models: {models[:3]}...")
+                return models, api_version
+        
+        print(f"[DEBUG] Failed to list models from both v1 and v1beta")
+        return [], 'v1beta'
+        
+    except Exception as e:
+        print(f"[DEBUG] Error listing models: {e}")
+        return [], 'v1beta'
+
 def call_gemini_api(prompt: str) -> Tuple[str, List[str]]:
     """Call Gemini API with grounding"""
-    print(f"[DEBUG] Making Gemini API call with model: gemini-pro")
+    print(f"[DEBUG] Making Gemini API call")
     print(f"[DEBUG] API key present: {bool(GEMINI_API_KEY)} (ends with: {GEMINI_API_KEY[-6:] if GEMINI_API_KEY else 'None'})")
     
     if not GEMINI_API_KEY or not requests:
@@ -250,8 +275,9 @@ def call_gemini_api(prompt: str) -> Tuple[str, List[str]]:
     
     print(f"[DEBUG] Calling Gemini API...")
     
-    # Note: This is a simplified implementation
-    # Actual Gemini API with grounding may require different endpoints
+    # First, check what models are available
+    available_models, api_version = list_gemini_models()
+    
     headers = {
         "Content-Type": "application/json"
     }
@@ -267,47 +293,71 @@ def call_gemini_api(prompt: str) -> Tuple[str, List[str]]:
         }
     }
     
-    try:
-        # Try the updated Gemini 1.5 model first
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={GEMINI_API_KEY}"
-        print(f"[DEBUG] Making request to: {url[:80]}...")
-        response = requests.post(url, headers=headers, json=data, timeout=30)
-        
-        # If that fails with 404, try the older model name
-        if response.status_code == 404:
-            print(f"[DEBUG] Gemini 1.5 model not found, trying gemini-pro...")
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={GEMINI_API_KEY}"
+    # Try different model names in order of preference
+    models_to_try = [
+        "models/gemini-1.5-flash",
+        "models/gemini-1.5-pro", 
+        "models/gemini-pro",
+        "models/text-bison-001",
+        "gemini-1.5-flash",
+        "gemini-1.5-pro",
+        "gemini-pro"
+    ]
+    
+    # Filter to only try models that actually exist (if we got a list)
+    if available_models:
+        models_to_try = [model for model in models_to_try if model in available_models or model.replace('models/', '') in [m.replace('models/', '') for m in available_models]]
+        if not models_to_try and available_models:
+            # If none of our preferred models exist, try the first available one
+            models_to_try = [available_models[0]]
+    
+    for model_name in models_to_try:
+        try:
+            # Use the working API version
+            url = f"https://generativelanguage.googleapis.com/{api_version}/{model_name}:generateContent?key={GEMINI_API_KEY}"
+            print(f"[DEBUG] Trying model: {model_name} at {url[:70]}...")
+            
             response = requests.post(url, headers=headers, json=data, timeout=30)
-        
-        # If still 404, try the alternative endpoint
-        if response.status_code == 404:
-            print(f"[DEBUG] Standard endpoint failed, trying alternative...")
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
-            response = requests.post(url, headers=headers, json=data, timeout=30)
-        
-        print(f"[DEBUG] Gemini API response status: {response.status_code}")
-        
-        if response.status_code == 200:
-            result = response.json()
-            print(f"[DEBUG] Gemini API response structure: {list(result.keys())}")
+            print(f"[DEBUG] Gemini API response status: {response.status_code}")
             
-            response_text = result.get('candidates', [{}])[0].get('content', {}).get('parts', [{}])[0].get('text', '')
-            print(f"[DEBUG] Gemini API call successful")
-            print(f"[DEBUG] Response length: {len(response_text)} characters")
-            print(f"[DEBUG] Response preview: {response_text[:100]}...")
+            if response.status_code == 200:
+                result = response.json()
+                print(f"[DEBUG] Gemini API response structure: {list(result.keys())}")
+                
+                # Handle different response structures
+                response_text = ""
+                if 'candidates' in result and result['candidates']:
+                    candidate = result['candidates'][0]
+                    if 'content' in candidate and 'parts' in candidate['content']:
+                        parts = candidate['content']['parts']
+                        if parts and 'text' in parts[0]:
+                            response_text = parts[0]['text']
+                
+                if response_text:
+                    print(f"[DEBUG] Gemini API call successful with model: {model_name}")
+                    print(f"[DEBUG] Response length: {len(response_text)} characters")
+                    print(f"[DEBUG] Response preview: {response_text[:100]}...")
+                    
+                    # Extract URLs from the response text
+                    citations = extract_urls_from_text(response_text)
+                    print(f"[DEBUG] Extracted {len(citations)} citations: {citations[:3]}...")
+                    return response_text, citations
+                else:
+                    print(f"[DEBUG] Empty response from model: {model_name}")
             
-            # Extract URLs from the response text
-            citations = extract_urls_from_text(response_text)
-            print(f"[DEBUG] Extracted {len(citations)} citations: {citations[:3]}...")
-            return response_text, citations
-        else:
-            error_text = response.text if hasattr(response, 'text') else 'No error details'
-            print(f"[DEBUG] Gemini API error: {response.status_code} - {error_text}")
-            return f"API Error: {response.status_code} - {error_text}", []
-            
-    except Exception as e:
-        print(f"[DEBUG] Gemini API exception: {type(e).__name__}: {str(e)}")
-        return f"Error: {str(e)}", []
+            elif response.status_code == 404:
+                print(f"[DEBUG] Model {model_name} not found, trying next...")
+                continue
+            else:
+                error_text = response.text if hasattr(response, 'text') else 'No error details'
+                print(f"[DEBUG] Gemini API error with {model_name}: {response.status_code} - {error_text[:200]}...")
+                
+        except Exception as e:
+            print(f"[DEBUG] Exception with model {model_name}: {type(e).__name__}: {str(e)}")
+            continue
+    
+    print(f"[DEBUG] All Gemini models failed")
+    return "All Gemini API models failed", []
 
 def call_perplexity_api(prompt: str) -> Tuple[str, List[str]]:
     """Call Perplexity API"""
@@ -436,13 +486,13 @@ def run_benchmark(dry_run=False):
     if dry_run:
         providers = [
             ("ChatGPT", "gpt-4-turbo", call_stub_chatgpt),
-            ("Gemini", "gemini-1.5-flash", call_stub_gemini),
+            ("Gemini", "gemini-auto", call_stub_gemini),
             ("Perplexity", "llama-3.1-sonar-small-128k-online", call_stub_perplexity)
         ]
     else:
         providers = [
             ("ChatGPT", "gpt-4-turbo", call_openai_api),
-            ("Gemini", "gemini-1.5-flash", call_gemini_api),
+            ("Gemini", "gemini-auto", call_gemini_api),
             ("Perplexity", "llama-3.1-sonar-small-128k-online", call_perplexity_api)
         ]
     
