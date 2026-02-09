@@ -1,0 +1,264 @@
+date,provider,model,prompt_id,prompt,response,citation_url,citation_domain
+2026-02-09,ChatGPT,gpt-4-turbo,001,How do I deploy an Azure Function using Bicep?,"Deploying an Azure Function using Bicep can be accomplished by defining your Azure Function and the related resources in a Bicep file. Below is a step-by-step guide along with relevant code snippets and links to official documentation.
+
+### Step 1: Set Up Your Bicep Environment
+
+Before you start, ensure that you have the following prerequisites:
+
+1. [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) installed.
+2. Bicep CLI installed. You can install it as an extension for ...",https://docs.microsoft.com/en-us/cli/azure/install-azure-cli),learn.microsoft.com
+2026-02-09,ChatGPT,gpt-4-turbo,001,How do I deploy an Azure Function using Bicep?,"Deploying an Azure Function using Bicep can be accomplished by defining your Azure Function and the related resources in a Bicep file. Below is a step-by-step guide along with relevant code snippets and links to official documentation.
+
+### Step 1: Set Up Your Bicep Environment
+
+Before you start, ensure that you have the following prerequisites:
+
+1. [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) installed.
+2. Bicep CLI installed. You can install it as an extension for ...",https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/overview).,learn.microsoft.com
+2026-02-09,ChatGPT,gpt-4-turbo,001,How do I deploy an Azure Function using Bicep?,"Deploying an Azure Function using Bicep can be accomplished by defining your Azure Function and the related resources in a Bicep file. Below is a step-by-step guide along with relevant code snippets and links to official documentation.
+
+### Step 1: Set Up Your Bicep Environment
+
+Before you start, ensure that you have the following prerequisites:
+
+1. [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) installed.
+2. Bicep CLI installed. You can install it as an extension for ...",https://docs.microsoft.com/en-us/azure/azure-functions/functions-deploy-using-bicep).,learn.microsoft.com
+2026-02-09,ChatGPT,gpt-4-turbo,001,How do I deploy an Azure Function using Bicep?,"Deploying an Azure Function using Bicep can be accomplished by defining your Azure Function and the related resources in a Bicep file. Below is a step-by-step guide along with relevant code snippets and links to official documentation.
+
+### Step 1: Set Up Your Bicep Environment
+
+Before you start, ensure that you have the following prerequisites:
+
+1. [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) installed.
+2. Bicep CLI installed. You can install it as an extension for ...",https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest).,learn.microsoft.com
+2026-02-09,Gemini,gemini-pro,001,How do I deploy an Azure Function using Bicep?,API key not configured or requests not available,NONE,NONE
+2026-02-09,Perplexity,llama-3.1-sonar-small-128k-online,001,How do I deploy an Azure Function using Bicep?,API key not configured or requests not available,NONE,NONE
+2026-02-09,ChatGPT,gpt-4-turbo,002,What is Azure Virtual Network peering?,"Azure Virtual Network (VNet) peering is a networking feature in Microsoft Azure that enables you to connect two or more Azure virtual networks (VNets) in the same region or across different regions. This allows them to communicate with each other directly using private IP addresses, just like they are part of the same network. VNet peering is useful for scenarios such as sharing resources, reducing latency, and simplifying the architecture of applications spread across multiple networks.
+
+### Ke...",https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-peering-overview),learn.microsoft.com
+2026-02-09,ChatGPT,gpt-4-turbo,002,What is Azure Virtual Network peering?,"Azure Virtual Network (VNet) peering is a networking feature in Microsoft Azure that enables you to connect two or more Azure virtual networks (VNets) in the same region or across different regions. This allows them to communicate with each other directly using private IP addresses, just like they are part of the same network. VNet peering is useful for scenarios such as sharing resources, reducing latency, and simplifying the architecture of applications spread across multiple networks.
+
+### Ke...",https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-peering-tutorial),learn.microsoft.com
+2026-02-09,ChatGPT,gpt-4-turbo,002,What is Azure Virtual Network peering?,"Azure Virtual Network (VNet) peering is a networking feature in Microsoft Azure that enables you to connect two or more Azure virtual networks (VNets) in the same region or across different regions. This allows them to communicate with each other directly using private IP addresses, just like they are part of the same network. VNet peering is useful for scenarios such as sharing resources, reducing latency, and simplifying the architecture of applications spread across multiple networks.
+
+### Ke...",https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-peering-best-practices),learn.microsoft.com
+2026-02-09,Gemini,gemini-pro,002,What is Azure Virtual Network peering?,API key not configured or requests not available,NONE,NONE
+2026-02-09,Perplexity,llama-3.1-sonar-small-128k-online,002,What is Azure Virtual Network peering?,API key not configured or requests not available,NONE,NONE
+2026-02-09,ChatGPT,gpt-4-turbo,003,Azure Functions vs Logic Apps — when should I use each?,"Azure Functions and Azure Logic Apps are both services offered by Microsoft Azure that enable you to create workflows and automate processes, but they have different strengths and use cases. Understanding when to use each service can help you make informed decisions for your applications.
+
+### Azure Functions
+
+**Use Cases:**
+1. **Event-driven Programming**: Azure Functions is great for situations where you need to run small pieces of code in response to events, such as HTTP requests, timer trigg...",https://docs.microsoft.com/en-us/azure/functions/functions-overview),learn.microsoft.com
+2026-02-09,ChatGPT,gpt-4-turbo,003,Azure Functions vs Logic Apps — when should I use each?,"Azure Functions and Azure Logic Apps are both services offered by Microsoft Azure that enable you to create workflows and automate processes, but they have different strengths and use cases. Understanding when to use each service can help you make informed decisions for your applications.
+
+### Azure Functions
+
+**Use Cases:**
+1. **Event-driven Programming**: Azure Functions is great for situations where you need to run small pieces of code in response to events, such as HTTP requests, timer trigg...",https://docs.microsoft.com/en-us/azure/azure-functions/functions-when-to-use),learn.microsoft.com
+2026-02-09,ChatGPT,gpt-4-turbo,003,Azure Functions vs Logic Apps — when should I use each?,"Azure Functions and Azure Logic Apps are both services offered by Microsoft Azure that enable you to create workflows and automate processes, but they have different strengths and use cases. Understanding when to use each service can help you make informed decisions for your applications.
+
+### Azure Functions
+
+**Use Cases:**
+1. **Event-driven Programming**: Azure Functions is great for situations where you need to run small pieces of code in response to events, such as HTTP requests, timer trigg...",https://docs.microsoft.com/en-us/azure/logic-apps/logic-apps-overview),learn.microsoft.com
+2026-02-09,ChatGPT,gpt-4-turbo,003,Azure Functions vs Logic Apps — when should I use each?,"Azure Functions and Azure Logic Apps are both services offered by Microsoft Azure that enable you to create workflows and automate processes, but they have different strengths and use cases. Understanding when to use each service can help you make informed decisions for your applications.
+
+### Azure Functions
+
+**Use Cases:**
+1. **Event-driven Programming**: Azure Functions is great for situations where you need to run small pieces of code in response to events, such as HTTP requests, timer trigg...",https://docs.microsoft.com/en-us/azure/logic-apps/logic-apps-when-to-use-logic-apps),learn.microsoft.com
+2026-02-09,ChatGPT,gpt-4-turbo,003,Azure Functions vs Logic Apps — when should I use each?,"Azure Functions and Azure Logic Apps are both services offered by Microsoft Azure that enable you to create workflows and automate processes, but they have different strengths and use cases. Understanding when to use each service can help you make informed decisions for your applications.
+
+### Azure Functions
+
+**Use Cases:**
+1. **Event-driven Programming**: Azure Functions is great for situations where you need to run small pieces of code in response to events, such as HTTP requests, timer trigg...",https://docs.microsoft.com/en-us/azure/architecture/serverless/serverless-architecture-overview),learn.microsoft.com
+2026-02-09,Gemini,gemini-pro,003,Azure Functions vs Logic Apps — when should I use each?,API key not configured or requests not available,NONE,NONE
+2026-02-09,Perplexity,llama-3.1-sonar-small-128k-online,003,Azure Functions vs Logic Apps — when should I use each?,API key not configured or requests not available,NONE,NONE
+2026-02-09,ChatGPT,gpt-4-turbo,004,Why does my Azure DevOps pipeline fail with error MSB1009?,"The MSB1009 error in Azure DevOps indicates that the project file cannot be found. This is often seen with the message:
+
+```
+error MSB1009: project file 'YourProjectFile.csproj' was not found.
+```
+
+### Possible Causes:
+1. **Incorrect Path**: The most common reason for this error is that the pipeline script is running with an incorrect path to the project file. Double-check the path specified in your build definition.
+
+2. **Missing Project File**: The project file might not be included in the sou...",https://learn.microsoft.com/en-us/azure/devops/pipelines/errors?view=azure-devops,learn.microsoft.com
+2026-02-09,ChatGPT,gpt-4-turbo,004,Why does my Azure DevOps pipeline fail with error MSB1009?,"The MSB1009 error in Azure DevOps indicates that the project file cannot be found. This is often seen with the message:
+
+```
+error MSB1009: project file 'YourProjectFile.csproj' was not found.
+```
+
+### Possible Causes:
+1. **Incorrect Path**: The most common reason for this error is that the pipeline script is running with an incorrect path to the project file. Double-check the path specified in your build definition.
+
+2. **Missing Project File**: The project file might not be included in the sou...",https://learn.microsoft.com/en-us/azure/devops/server/admin/setup/troubleshooting?view=azure-devops),learn.microsoft.com
+2026-02-09,ChatGPT,gpt-4-turbo,004,Why does my Azure DevOps pipeline fail with error MSB1009?,"The MSB1009 error in Azure DevOps indicates that the project file cannot be found. This is often seen with the message:
+
+```
+error MSB1009: project file 'YourProjectFile.csproj' was not found.
+```
+
+### Possible Causes:
+1. **Incorrect Path**: The most common reason for this error is that the pipeline script is running with an incorrect path to the project file. Double-check the path specified in your build definition.
+
+2. **Missing Project File**: The project file might not be included in the sou...",https://learn.microsoft.com/en-us/azure/devops/pipelines/yaml-schema?view=azure-pipelines&tabs=example,learn.microsoft.com
+2026-02-09,Gemini,gemini-pro,004,Why does my Azure DevOps pipeline fail with error MSB1009?,API key not configured or requests not available,NONE,NONE
+2026-02-09,Perplexity,llama-3.1-sonar-small-128k-online,004,Why does my Azure DevOps pipeline fail with error MSB1009?,API key not configured or requests not available,NONE,NONE
+2026-02-09,ChatGPT,gpt-4-turbo,005,What skills are covered in the AZ-104 certification?,"The AZ-104 certification, officially known as ""Microsoft Certified: Azure Administrator Associate,"" is designed to assess the skills and knowledge required to manage Azure resources, services, and solutions effectively. Here are the key skills covered in the AZ-104 certification:
+
+1. **Manage Azure identities and governance (15-20%)**:
+   - Configure Azure Active Directory (Azure AD) identities
+   - Manage role-based access control (RBAC)
+   - Implement Azure policies
+   - Manage Azure subscript...",https://learn.microsoft.com/en-us/certifications/certified-azure-administrator/),learn.microsoft.com
+2026-02-09,ChatGPT,gpt-4-turbo,005,What skills are covered in the AZ-104 certification?,"The AZ-104 certification, officially known as ""Microsoft Certified: Azure Administrator Associate,"" is designed to assess the skills and knowledge required to manage Azure resources, services, and solutions effectively. Here are the key skills covered in the AZ-104 certification:
+
+1. **Manage Azure identities and governance (15-20%)**:
+   - Configure Azure Active Directory (Azure AD) identities
+   - Manage role-based access control (RBAC)
+   - Implement Azure policies
+   - Manage Azure subscript...",https://learn.microsoft.com/en-us/training/certifications/azure-administrator/),learn.microsoft.com
+2026-02-09,ChatGPT,gpt-4-turbo,005,What skills are covered in the AZ-104 certification?,"The AZ-104 certification, officially known as ""Microsoft Certified: Azure Administrator Associate,"" is designed to assess the skills and knowledge required to manage Azure resources, services, and solutions effectively. Here are the key skills covered in the AZ-104 certification:
+
+1. **Manage Azure identities and governance (15-20%)**:
+   - Configure Azure Active Directory (Azure AD) identities
+   - Manage role-based access control (RBAC)
+   - Implement Azure policies
+   - Manage Azure subscript...",https://learn.microsoft.com/en-us/certifications/exams/az-104),learn.microsoft.com
+2026-02-09,Gemini,gemini-pro,005,What skills are covered in the AZ-104 certification?,API key not configured or requests not available,NONE,NONE
+2026-02-09,Perplexity,llama-3.1-sonar-small-128k-online,005,What skills are covered in the AZ-104 certification?,API key not configured or requests not available,NONE,NONE
+2026-02-09,ChatGPT,gpt-4-turbo,006,How do I configure Azure Application Gateway with SSL termination?,"Configuring an Azure Application Gateway with SSL termination involves several steps. SSL termination means that the Application Gateway will handle the SSL decryption of incoming requests before forwarding them to the backend servers. Here is a step-by-step guide on how to do this:
+
+### Step-by-Step Configuration
+
+1. **Create an Azure Application Gateway**:
+   - Go to the Azure portal.
+   - Click on ""Create a resource"" and search for ""Application Gateway"".
+   - Fill out the necessary details (l...",https://docs.microsoft.com/en-us/azure/application-gateway/overview),learn.microsoft.com
+2026-02-09,ChatGPT,gpt-4-turbo,006,How do I configure Azure Application Gateway with SSL termination?,"Configuring an Azure Application Gateway with SSL termination involves several steps. SSL termination means that the Application Gateway will handle the SSL decryption of incoming requests before forwarding them to the backend servers. Here is a step-by-step guide on how to do this:
+
+### Step-by-Step Configuration
+
+1. **Create an Azure Application Gateway**:
+   - Go to the Azure portal.
+   - Click on ""Create a resource"" and search for ""Application Gateway"".
+   - Fill out the necessary details (l...",https://docs.microsoft.com/en-us/azure/application-gateway/create-gateway-ssl-portal),learn.microsoft.com
+2026-02-09,ChatGPT,gpt-4-turbo,006,How do I configure Azure Application Gateway with SSL termination?,"Configuring an Azure Application Gateway with SSL termination involves several steps. SSL termination means that the Application Gateway will handle the SSL decryption of incoming requests before forwarding them to the backend servers. Here is a step-by-step guide on how to do this:
+
+### Step-by-Step Configuration
+
+1. **Create an Azure Application Gateway**:
+   - Go to the Azure portal.
+   - Click on ""Create a resource"" and search for ""Application Gateway"".
+   - Fill out the necessary details (l...",https://docs.microsoft.com/en-us/azure/application-gateway/ssl-termination),learn.microsoft.com
+2026-02-09,ChatGPT,gpt-4-turbo,006,How do I configure Azure Application Gateway with SSL termination?,"Configuring an Azure Application Gateway with SSL termination involves several steps. SSL termination means that the Application Gateway will handle the SSL decryption of incoming requests before forwarding them to the backend servers. Here is a step-by-step guide on how to do this:
+
+### Step-by-Step Configuration
+
+1. **Create an Azure Application Gateway**:
+   - Go to the Azure portal.
+   - Click on ""Create a resource"" and search for ""Application Gateway"".
+   - Fill out the necessary details (l...",https://docs.microsoft.com/en-us/azure/application-gateway/configure-ssl-settings),learn.microsoft.com
+2026-02-09,Gemini,gemini-pro,006,How do I configure Azure Application Gateway with SSL termination?,API key not configured or requests not available,NONE,NONE
+2026-02-09,Perplexity,llama-3.1-sonar-small-128k-online,006,How do I configure Azure Application Gateway with SSL termination?,API key not configured or requests not available,NONE,NONE
+2026-02-09,ChatGPT,gpt-4-turbo,007,What is Azure Service Bus and when should I use it?,"Azure Service Bus is a fully managed enterprise message broker service provided by Microsoft Azure. It is designed to facilitate communication between applications, services, and systems, which may be distributed across different environments and platforms. Azure Service Bus provides reliable messaging capabilities, enabling asynchronous communication to decouple application components and improve scalability and resilience.
+
+### Key Features of Azure Service Bus:
+
+1. **Messaging Patterns**: Sup...",https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-messaging-overview),learn.microsoft.com
+2026-02-09,ChatGPT,gpt-4-turbo,007,What is Azure Service Bus and when should I use it?,"Azure Service Bus is a fully managed enterprise message broker service provided by Microsoft Azure. It is designed to facilitate communication between applications, services, and systems, which may be distributed across different environments and platforms. Azure Service Bus provides reliable messaging capabilities, enabling asynchronous communication to decouple application components and improve scalability and resilience.
+
+### Key Features of Azure Service Bus:
+
+1. **Messaging Patterns**: Sup...",https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-dotnet-get-started-with-queues),learn.microsoft.com
+2026-02-09,ChatGPT,gpt-4-turbo,007,What is Azure Service Bus and when should I use it?,"Azure Service Bus is a fully managed enterprise message broker service provided by Microsoft Azure. It is designed to facilitate communication between applications, services, and systems, which may be distributed across different environments and platforms. Azure Service Bus provides reliable messaging capabilities, enabling asynchronous communication to decouple application components and improve scalability and resilience.
+
+### Key Features of Azure Service Bus:
+
+1. **Messaging Patterns**: Sup...",https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-messaging-validate-patterns),learn.microsoft.com
+2026-02-09,ChatGPT,gpt-4-turbo,007,What is Azure Service Bus and when should I use it?,"Azure Service Bus is a fully managed enterprise message broker service provided by Microsoft Azure. It is designed to facilitate communication between applications, services, and systems, which may be distributed across different environments and platforms. Azure Service Bus provides reliable messaging capabilities, enabling asynchronous communication to decouple application components and improve scalability and resilience.
+
+### Key Features of Azure Service Bus:
+
+1. **Messaging Patterns**: Sup...",https://azure.microsoft.com/pricing/details/service-bus/),azure.microsoft.com
+2026-02-09,ChatGPT,gpt-4-turbo,007,What is Azure Service Bus and when should I use it?,"Azure Service Bus is a fully managed enterprise message broker service provided by Microsoft Azure. It is designed to facilitate communication between applications, services, and systems, which may be distributed across different environments and platforms. Azure Service Bus provides reliable messaging capabilities, enabling asynchronous communication to decouple application components and improve scalability and resilience.
+
+### Key Features of Azure Service Bus:
+
+1. **Messaging Patterns**: Sup...",https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-messaging-overview,learn.microsoft.com
+2026-02-09,Gemini,gemini-pro,007,What is Azure Service Bus and when should I use it?,API key not configured or requests not available,NONE,NONE
+2026-02-09,Perplexity,llama-3.1-sonar-small-128k-online,007,What is Azure Service Bus and when should I use it?,API key not configured or requests not available,NONE,NONE
+2026-02-09,ChatGPT,gpt-4-turbo,008,How do I create a custom Azure policy?,"Creating a custom Azure policy involves several steps, including defining your policy in JSON format, assigning your policy to a scope (such as a management group, subscription, or resource group), and then evaluating the policy against your Azure resources.
+
+Here is a step-by-step guide on how to create a custom Azure policy:
+
+### Step 1: Define the Policy
+
+1. **Create a JSON file** that defines the policy. This includes:
+    - **Policy rule**: The JSON structure that specifies the conditions u...",https://portal.azure.com).,portal.azure.com).
+2026-02-09,ChatGPT,gpt-4-turbo,008,How do I create a custom Azure policy?,"Creating a custom Azure policy involves several steps, including defining your policy in JSON format, assigning your policy to a scope (such as a management group, subscription, or resource group), and then evaluating the policy against your Azure resources.
+
+Here is a step-by-step guide on how to create a custom Azure policy:
+
+### Step 1: Define the Policy
+
+1. **Create a JSON file** that defines the policy. This includes:
+    - **Policy rule**: The JSON structure that specifies the conditions u...",https://docs.microsoft.com/en-us/azure/governance/policy/overview):,learn.microsoft.com
+2026-02-09,ChatGPT,gpt-4-turbo,008,How do I create a custom Azure policy?,"Creating a custom Azure policy involves several steps, including defining your policy in JSON format, assigning your policy to a scope (such as a management group, subscription, or resource group), and then evaluating the policy against your Azure resources.
+
+Here is a step-by-step guide on how to create a custom Azure policy:
+
+### Step 1: Define the Policy
+
+1. **Create a JSON file** that defines the policy. This includes:
+    - **Policy rule**: The JSON structure that specifies the conditions u...",https://docs.microsoft.com/en-us/azure/governance/policy/create-definition):,learn.microsoft.com
+2026-02-09,ChatGPT,gpt-4-turbo,008,How do I create a custom Azure policy?,"Creating a custom Azure policy involves several steps, including defining your policy in JSON format, assigning your policy to a scope (such as a management group, subscription, or resource group), and then evaluating the policy against your Azure resources.
+
+Here is a step-by-step guide on how to create a custom Azure policy:
+
+### Step 1: Define the Policy
+
+1. **Create a JSON file** that defines the policy. This includes:
+    - **Policy rule**: The JSON structure that specifies the conditions u...",https://docs.microsoft.com/en-us/azure/governance/policy/assign-policy):,learn.microsoft.com
+2026-02-09,Gemini,gemini-pro,008,How do I create a custom Azure policy?,API key not configured or requests not available,NONE,NONE
+2026-02-09,Perplexity,llama-3.1-sonar-small-128k-online,008,How do I create a custom Azure policy?,API key not configured or requests not available,NONE,NONE
+2026-02-09,ChatGPT,gpt-4-turbo,009,Why is my Azure Storage account showing throttling errors?,"Throttling errors in Azure Storage accounts typically occur when the number of requests exceeds the allowed limits for the storage service. Microsoft Azure employs throttling to maintain performance and ensure fair resource allocation among users. Here are some common reasons for throttling errors:
+
+1. **Request Rate Exceeded**: Each Azure Storage account has specific limits on the requests that can be processed per second. If your application makes requests faster than the allowed rate, you may...",https://docs.microsoft.com/en-us/azure/storage/common/storage-scalability-targets),learn.microsoft.com
+2026-02-09,ChatGPT,gpt-4-turbo,009,Why is my Azure Storage account showing throttling errors?,"Throttling errors in Azure Storage accounts typically occur when the number of requests exceeds the allowed limits for the storage service. Microsoft Azure employs throttling to maintain performance and ensure fair resource allocation among users. Here are some common reasons for throttling errors:
+
+1. **Request Rate Exceeded**: Each Azure Storage account has specific limits on the requests that can be processed per second. If your application makes requests faster than the allowed rate, you may...",https://docs.microsoft.com/en-us/rest/api/cosmos-db/handling-continuation-tokens,learn.microsoft.com
+2026-02-09,ChatGPT,gpt-4-turbo,009,Why is my Azure Storage account showing throttling errors?,"Throttling errors in Azure Storage accounts typically occur when the number of requests exceeds the allowed limits for the storage service. Microsoft Azure employs throttling to maintain performance and ensure fair resource allocation among users. Here are some common reasons for throttling errors:
+
+1. **Request Rate Exceeded**: Each Azure Storage account has specific limits on the requests that can be processed per second. If your application makes requests faster than the allowed rate, you may...",https://learn.microsoft.com/en-us/azure/storage/blobs/storage-performance?tabs=storage-redundancy,learn.microsoft.com
+2026-02-09,ChatGPT,gpt-4-turbo,009,Why is my Azure Storage account showing throttling errors?,"Throttling errors in Azure Storage accounts typically occur when the number of requests exceeds the allowed limits for the storage service. Microsoft Azure employs throttling to maintain performance and ensure fair resource allocation among users. Here are some common reasons for throttling errors:
+
+1. **Request Rate Exceeded**: Each Azure Storage account has specific limits on the requests that can be processed per second. If your application makes requests faster than the allowed rate, you may...",https://learn.microsoft.com/en-us/azure/storage/common/storage-throttling-guide),learn.microsoft.com
+2026-02-09,Gemini,gemini-pro,009,Why is my Azure Storage account showing throttling errors?,API key not configured or requests not available,NONE,NONE
+2026-02-09,Perplexity,llama-3.1-sonar-small-128k-online,009,Why is my Azure Storage account showing throttling errors?,API key not configured or requests not available,NONE,NONE
+2026-02-09,ChatGPT,gpt-4-turbo,010,Azure SQL Database vs Azure SQL Managed Instance differences?,"Azure SQL Database and Azure SQL Managed Instance are two offerings within Azure's SQL database services, but they cater to different use cases and have distinct features. Below are the primary differences between the two:
+
+### 1. Deployment Model
+- **Azure SQL Database**: This is a managed database service designed for modern cloud applications. It operates under a single database model, which can be vertically scaled as needed.
+- **Azure SQL Managed Instance**: Managed Instance is designed for...",https://docs.microsoft.com/en-us/azure/azure-sql/database/),learn.microsoft.com
+2026-02-09,ChatGPT,gpt-4-turbo,010,Azure SQL Database vs Azure SQL Managed Instance differences?,"Azure SQL Database and Azure SQL Managed Instance are two offerings within Azure's SQL database services, but they cater to different use cases and have distinct features. Below are the primary differences between the two:
+
+### 1. Deployment Model
+- **Azure SQL Database**: This is a managed database service designed for modern cloud applications. It operates under a single database model, which can be vertically scaled as needed.
+- **Azure SQL Managed Instance**: Managed Instance is designed for...",https://docs.microsoft.com/en-us/azure/azure-sql/managed-instance/),learn.microsoft.com
+2026-02-09,ChatGPT,gpt-4-turbo,010,Azure SQL Database vs Azure SQL Managed Instance differences?,"Azure SQL Database and Azure SQL Managed Instance are two offerings within Azure's SQL database services, but they cater to different use cases and have distinct features. Below are the primary differences between the two:
+
+### 1. Deployment Model
+- **Azure SQL Database**: This is a managed database service designed for modern cloud applications. It operates under a single database model, which can be vertically scaled as needed.
+- **Azure SQL Managed Instance**: Managed Instance is designed for...",https://azure.microsoft.com/en-us/pricing/details/sql-database/),azure.microsoft.com
+2026-02-09,ChatGPT,gpt-4-turbo,010,Azure SQL Database vs Azure SQL Managed Instance differences?,"Azure SQL Database and Azure SQL Managed Instance are two offerings within Azure's SQL database services, but they cater to different use cases and have distinct features. Below are the primary differences between the two:
+
+### 1. Deployment Model
+- **Azure SQL Database**: This is a managed database service designed for modern cloud applications. It operates under a single database model, which can be vertically scaled as needed.
+- **Azure SQL Managed Instance**: Managed Instance is designed for...",https://azure.microsoft.com/en-us/pricing/details/sql-managed-instance/),azure.microsoft.com
+2026-02-09,Gemini,gemini-pro,010,Azure SQL Database vs Azure SQL Managed Instance differences?,API key not configured or requests not available,NONE,NONE
+2026-02-09,Perplexity,llama-3.1-sonar-small-128k-online,010,Azure SQL Database vs Azure SQL Managed Instance differences?,API key not configured or requests not available,NONE,NONE
