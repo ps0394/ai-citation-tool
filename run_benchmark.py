@@ -285,7 +285,7 @@ def call_gemini_api(prompt: str) -> Tuple[str, List[str]]:
     data = {
         "contents": [{
             "parts": [{
-                "text": f"Please answer this question with citations to official documentation: {prompt}"
+                "text": f"Please answer this question about Microsoft Azure and include specific URL citations to official Microsoft Learn documentation. Question: {prompt}"
             }]
         }],
         "generationConfig": {
@@ -337,10 +337,16 @@ def call_gemini_api(prompt: str) -> Tuple[str, List[str]]:
                     print(f"[DEBUG] Gemini API call successful with model: {model_name}")
                     print(f"[DEBUG] Response length: {len(response_text)} characters")
                     print(f"[DEBUG] Response preview: {response_text[:100]}...")
+                    print(f"[DEBUG] Full response (for citation analysis): {response_text}")
                     
                     # Extract URLs from the response text
                     citations = extract_urls_from_text(response_text)
                     print(f"[DEBUG] Extracted {len(citations)} citations: {citations[:3]}...")
+                    
+                    # If no citations found, try to encourage more in future calls
+                    if len(citations) == 0:
+                        print(f"[DEBUG] No citations found in Gemini response. Response content: {response_text[:200]}...")
+                    
                     return response_text, citations
                 else:
                     print(f"[DEBUG] Empty response from model: {model_name}")
