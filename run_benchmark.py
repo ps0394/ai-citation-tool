@@ -285,22 +285,29 @@ def call_gemini_api(prompt: str) -> Tuple[str, List[str]]:
     data = {
         "contents": [{
             "parts": [{
-                "text": f"Please answer this question about Microsoft Azure and include specific URL citations to official Microsoft Learn documentation. Question: {prompt}"
+                "text": f"Please provide a comprehensive answer to this Microsoft Azure question. Include specific URL citations to official Microsoft Learn documentation, GitHub repositories, or Microsoft technical blogs. Make sure to include actual working URLs in your response. Question: {prompt}"
             }]
         }],
         "generationConfig": {
-            "maxOutputTokens": 1000
+            "maxOutputTokens": 2000,  # Much higher for paid tier
+            "temperature": 0.3,       # Balanced creativity and accuracy
+            "topP": 0.8,
+            "topK": 40               # More diverse responses
         }
     }
     
-    # Try different model names in order of preference
+    # Try different model names in order of preference (paid tier models first)
     models_to_try = [
+        "models/gemini-2.5-pro",     # Latest and most capable
+        "models/gemini-2.5-flash",   # Fast and efficient
+        "models/gemini-1.5-pro",     # Proven reliable
         "models/gemini-1.5-flash",
-        "models/gemini-1.5-pro", 
         "models/gemini-pro",
         "models/text-bison-001",
-        "gemini-1.5-flash",
+        "gemini-2.5-pro",            # Alternative naming
+        "gemini-2.5-flash",
         "gemini-1.5-pro",
+        "gemini-1.5-flash",
         "gemini-pro"
     ]
     
@@ -324,19 +331,33 @@ def call_gemini_api(prompt: str) -> Tuple[str, List[str]]:
                 result = response.json()
                 print(f"[DEBUG] Gemini API response structure: {list(result.keys())}")
                 
-                # Handle different response structures
-                response_text = ""
-                if 'candidates' in result and result['candidates']:
-                    candidate = result['candidates'][0]
-                    if 'content' in candidate and 'parts' in candidate['content']:
-                        parts = candidate['content']['parts']
-                        if parts and 'text' in parts[0]:
-                            response_text = parts[0]['text']
+            # Check for quota/usage information
+            if 'usageMetadata' in result:
+                usage = result['usageMetadata']
+                print(f"[DEBUG] Gemini usage metadata: {usage}")
+            
+            # Handle different response structures
+            response_text = ""
+            if 'candidates' in result and result['candidates']:
+                candidate = result['candidates'][0]
+                
+                # Check if response was filtered or blocked
+                if 'finishReason' in candidate:
+                    finish_reason = candidate['finishReason']
+                    print(f"[DEBUG] Gemini finish reason: {finish_reason}")
+                    if finish_reason in ['SAFETY', 'BLOCKED', 'RECITATION']:
+                        print(f"[DEBUG] Gemini response was filtered due to: {finish_reason}")
+                
                 
                 if response_text:
                     print(f"[DEBUG] Gemini API call successful with model: {model_name}")
                     print(f"[DEBUG] Response length: {len(response_text)} characters")
                     print(f"[DEBUG] Response preview: {response_text[:100]}...")
+                    
+                    # Check if this looks like a comprehensive response (paid tier benefit)
+                    if len(response_text) > 1000:
+                        print(f"[DEBUG] Comprehensive response received (paid tier benefit)")
+                    
                     print(f"[DEBUG] Full response (for citation analysis): {response_text}")
                     
                     # Extract URLs from the response text
@@ -354,9 +375,16 @@ def call_gemini_api(prompt: str) -> Tuple[str, List[str]]:
             elif response.status_code == 404:
                 print(f"[DEBUG] Model {model_name} not found, trying next...")
                 continue
-            else:
-                error_text = response.text if hasattr(response, 'text') else 'No error details'
-                print(f"[DEBUG] Gemini API error with {model_name}: {response.status_code} - {error_text[:200]}...")
+        elif response.status_code == 429:
+            error_text = response.text if hasattr(response, 'text') else 'No error details'
+            print(f"[DEBUG] Gemini API rate limit exceeded with {model_name}: {error_text[:200]}...")
+            # For rate limits, we might want to try a different model
+            continue
+        elif response.status_code == 403:
+            error_text = response.text if hasattr(response, 'text') else 'No error details'
+            print(f"[DEBUG] Gemini API quota/permission error with {model_name}: {error_text[:200]}...")
+            # For quota errors, likely affects all models, so we can break early
+            break
                 
         except Exception as e:
             print(f"[DEBUG] Exception with model {model_name}: {type(e).__name__}: {str(e)}")
