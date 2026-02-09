@@ -241,8 +241,14 @@ def call_openai_api(prompt: str) -> Tuple[str, List[str]]:
 
 def call_gemini_api(prompt: str) -> Tuple[str, List[str]]:
     """Call Gemini API with grounding"""
+    print(f"[DEBUG] Making Gemini API call with model: gemini-pro")
+    print(f"[DEBUG] API key present: {bool(GEMINI_API_KEY)} (ends with: {GEMINI_API_KEY[-6:] if GEMINI_API_KEY else 'None'})")
+    
     if not GEMINI_API_KEY or not requests:
+        print(f"[DEBUG] Gemini API key or requests unavailable - API key: {bool(GEMINI_API_KEY)}, requests: {bool(requests)}")
         return "API key not configured or requests not available", []
+    
+    print(f"[DEBUG] Calling Gemini API...")
     
     # Note: This is a simplified implementation
     # Actual Gemini API with grounding may require different endpoints
@@ -253,7 +259,7 @@ def call_gemini_api(prompt: str) -> Tuple[str, List[str]]:
     data = {
         "contents": [{
             "parts": [{
-                "text": f"Please answer this question with citations: {prompt}"
+                "text": f"Please answer this question with citations to official documentation: {prompt}"
             }]
         }],
         "generationConfig": {
@@ -263,24 +269,43 @@ def call_gemini_api(prompt: str) -> Tuple[str, List[str]]:
     
     try:
         url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={GEMINI_API_KEY}"
+        print(f"[DEBUG] Making request to: {url[:80]}...")
         response = requests.post(url, headers=headers, json=data, timeout=30)
+        
+        print(f"[DEBUG] Gemini API response status: {response.status_code}")
         
         if response.status_code == 200:
             result = response.json()
+            print(f"[DEBUG] Gemini API response structure: {list(result.keys())}")
+            
             response_text = result.get('candidates', [{}])[0].get('content', {}).get('parts', [{}])[0].get('text', '')
+            print(f"[DEBUG] Gemini API call successful")
+            print(f"[DEBUG] Response length: {len(response_text)} characters")
+            print(f"[DEBUG] Response preview: {response_text[:100]}...")
+            
             # Extract URLs from the response text
             citations = extract_urls_from_text(response_text)
+            print(f"[DEBUG] Extracted {len(citations)} citations: {citations[:3]}...")
             return response_text, citations
         else:
-            return f"API Error: {response.status_code}", []
+            error_text = response.text if hasattr(response, 'text') else 'No error details'
+            print(f"[DEBUG] Gemini API error: {response.status_code} - {error_text}")
+            return f"API Error: {response.status_code} - {error_text}", []
             
     except Exception as e:
+        print(f"[DEBUG] Gemini API exception: {type(e).__name__}: {str(e)}")
         return f"Error: {str(e)}", []
 
 def call_perplexity_api(prompt: str) -> Tuple[str, List[str]]:
     """Call Perplexity API"""
+    print(f"[DEBUG] Making Perplexity API call with model: llama-3.1-sonar-small-128k-online")
+    print(f"[DEBUG] API key present: {bool(PERPLEXITY_API_KEY)} (ends with: {PERPLEXITY_API_KEY[-6:] if PERPLEXITY_API_KEY else 'None'})")
+    
     if not PERPLEXITY_API_KEY or not requests:
+        print(f"[DEBUG] Perplexity API key or requests unavailable - API key: {bool(PERPLEXITY_API_KEY)}, requests: {bool(requests)}")
         return "API key not configured or requests not available", []
+    
+    print(f"[DEBUG] Calling Perplexity API...")
     
     headers = {
         "Authorization": f"Bearer {PERPLEXITY_API_KEY}",
@@ -290,13 +315,14 @@ def call_perplexity_api(prompt: str) -> Tuple[str, List[str]]:
     data = {
         "model": "llama-3.1-sonar-small-128k-online",
         "messages": [
-            {"role": "user", "content": prompt}
+            {"role": "user", "content": f"Please answer this question with citations to official documentation: {prompt}"}
         ],
         "max_tokens": 1000,
         "return_citations": True
     }
     
     try:
+        print(f"[DEBUG] Making request to Perplexity API...")
         response = requests.post(
             "https://api.perplexity.ai/chat/completions",
             headers=headers,
@@ -304,23 +330,35 @@ def call_perplexity_api(prompt: str) -> Tuple[str, List[str]]:
             timeout=30
         )
         
+        print(f"[DEBUG] Perplexity API response status: {response.status_code}")
+        
         if response.status_code == 200:
             result = response.json()
+            print(f"[DEBUG] Perplexity API response structure: {list(result.keys())}")
+            
             response_text = result['choices'][0]['message']['content']
+            print(f"[DEBUG] Perplexity API call successful")
+            print(f"[DEBUG] Response length: {len(response_text)} characters")
+            print(f"[DEBUG] Response preview: {response_text[:100]}...")
             
             # Extract citations from Perplexity response
             citations = []
             if 'citations' in result:
                 citations = result['citations']
+                print(f"[DEBUG] Found {len(citations)} citations in response object")
             else:
                 # Fall back to extracting URLs from text
                 citations = extract_urls_from_text(response_text)
+                print(f"[DEBUG] Extracted {len(citations)} citations from response text: {citations[:3]}...")
             
             return response_text, citations
         else:
-            return f"API Error: {response.status_code}", []
+            error_text = response.text if hasattr(response, 'text') else 'No error details'
+            print(f"[DEBUG] Perplexity API error: {response.status_code} - {error_text}")
+            return f"API Error: {response.status_code} - {error_text}", []
             
     except Exception as e:
+        print(f"[DEBUG] Perplexity API exception: {type(e).__name__}: {str(e)}")
         return f"Error: {str(e)}", []
 
 def write_results_to_csv(results: List[Dict], output_file: str):
