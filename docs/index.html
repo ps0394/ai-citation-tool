@@ -761,18 +761,23 @@
 
         async function loadLatestResults() {
             try {
+                console.log('[DEBUG] Starting to load latest results...');
                 // Try to load the latest CSV file
                 const today = new Date().toISOString().split('T')[0];
                 let csvText = null;
                 
+                console.log('[DEBUG] Looking for today file:', `data/results_${today}.csv`);
+                
                 // Try today's file first
                 try {
                     const response = await fetch(`data/results_${today}.csv`);
+                    console.log('[DEBUG] Today file response status:', response.status);
                     if (response.ok) {
                         csvText = await response.text();
+                        console.log('[DEBUG] Today file loaded, length:', csvText.length);
                     }
                 } catch (e) {
-                    console.log('Today file not found, trying yesterday...');
+                    console.log('[DEBUG] Today file not found, error:', e.message);
                 }
                 
                 // Try yesterday's file if today's doesn't exist
@@ -780,123 +785,196 @@
                     const yesterday = new Date();
                     yesterday.setDate(yesterday.getDate() - 1);
                     const yesterdayStr = yesterday.toISOString().split('T')[0];
+                    console.log('[DEBUG] Looking for yesterday file:', `data/results_${yesterdayStr}.csv`);
                     try {
                         const response = await fetch(`data/results_${yesterdayStr}.csv`);
+                        console.log('[DEBUG] Yesterday file response status:', response.status);
                         if (response.ok) {
                             csvText = await response.text();
+                            console.log('[DEBUG] Yesterday file loaded, length:', csvText.length);
                         }
                     } catch (e) {
-                        console.log('Yesterday file not found, trying sample...');
+                        console.log('[DEBUG] Yesterday file not found, error:', e.message);
                     }
                 }
                 
                 // Try sample data if no real data exists
                 if (!csvText) {
+                    console.log('[DEBUG] Trying sample data file...');
                     try {
                         const response = await fetch('data/sample-results.csv');
+                        console.log('[DEBUG] Sample file response status:', response.status);
                         if (response.ok) {
                             csvText = await response.text();
+                            console.log('[DEBUG] Sample file loaded, length:', csvText.length);
                             showStatus('info', 'Showing sample data. Run a benchmark to see real results.');
                         }
                     } catch (e) {
-                        console.log('Sample file not found either');
+                        console.log('[DEBUG] Sample file not found either, error:', e.message);
                     }
                 }
                 
                 if (csvText) {
+                    console.log('[DEBUG] Parsing CSV data...');
                     parseAndDisplayResults(csvText);
                 } else {
+                    console.log('[DEBUG] No CSV files found, using hardcoded sample data');
                     // Show hardcoded sample data if no files are available
                     const sampleData = `date,provider,model,prompt_id,prompt,response,citation_url,citation_domain
-2026-02-06,ChatGPT,gpt-4o-mini,001,How do I deploy an Azure Function using Bicep?,"To deploy an Azure Function using Bicep, you need to define the necessary resources...",https://learn.microsoft.com/azure/azure-functions/,learn.microsoft.com
-2026-02-06,ChatGPT,gpt-4o-mini,001,How do I deploy an Azure Function using Bicep?,"To deploy an Azure Function using Bicep, you need to define the necessary resources...",https://learn.microsoft.com/azure/azure-resource-manager/bicep/,learn.microsoft.com
-2026-02-06,Gemini,gemini-pro,001,How do I deploy an Azure Function using Bicep?,"Based on official documentation...",https://learn.microsoft.com/en-us/azure/,learn.microsoft.com
-2026-02-06,Gemini,gemini-pro,001,How do I deploy an Azure Function using Bicep?,"Based on official documentation...",https://cloud.google.com/docs/,cloud.google.com
-2026-02-06,Perplexity,llama-3.1-sonar-small-128k-online,001,How do I deploy an Azure Function using Bicep?,"According to multiple sources including Microsoft Learn...",https://learn.microsoft.com/azure/azure-functions/,learn.microsoft.com
-2026-02-06,Perplexity,llama-3.1-sonar-small-128k-online,001,How do I deploy an Azure Function using Bicep?,"According to multiple sources including Microsoft Learn...",https://github.com/Azure/azure-quickstart-templates,github.com
-2026-02-06,ChatGPT,gpt-4o-mini,002,What is Azure Virtual Network peering?,"Azure Virtual Network peering enables connectivity...",https://learn.microsoft.com/azure/virtual-network/,learn.microsoft.com
-2026-02-06,ChatGPT,gpt-4o-mini,002,What is Azure Virtual Network peering?,"Azure Virtual Network peering enables connectivity...",https://stackoverflow.com/questions/azure-vnet,stackoverflow.com
-2026-02-06,Gemini,gemini-pro,002,What is Azure Virtual Network peering?,"Based on Microsoft documentation...",https://learn.microsoft.com/en-us/azure/,learn.microsoft.com
-2026-02-06,Perplexity,llama-3.1-sonar-small-128k-online,002,What is Azure Virtual Network peering?,"According to official sources...",https://docs.microsoft.com/azure/,learn.microsoft.com`;
+2026-02-10,ChatGPT,gpt-4-turbo,001,How do I deploy an Azure Function using Bicep?,"To deploy an Azure Function using Bicep, you need to define the necessary resources...",https://learn.microsoft.com/azure/azure-functions/,learn.microsoft.com
+2026-02-10,ChatGPT,gpt-4-turbo,001,How do I deploy an Azure Function using Bicep?,"To deploy an Azure Function using Bicep, you need to define the necessary resources...",https://learn.microsoft.com/azure/azure-resource-manager/bicep/,learn.microsoft.com
+2026-02-10,Gemini,gemini-1.5-pro,001,How do I deploy an Azure Function using Bicep?,"Based on official documentation...",https://learn.microsoft.com/en-us/azure/,learn.microsoft.com
+2026-02-10,Gemini,gemini-1.5-pro,001,How do I deploy an Azure Function using Bicep?,"Based on official documentation...",https://cloud.google.com/docs/,cloud.google.com
+2026-02-10,Perplexity,llama-3.1-sonar-small-128k-online,001,How do I deploy an Azure Function using Bicep?,"According to multiple sources including Microsoft Learn...",https://learn.microsoft.com/azure/azure-functions/,learn.microsoft.com
+2026-02-10,Perplexity,llama-3.1-sonar-small-128k-online,001,How do I deploy an Azure Function using Bicep?,"According to multiple sources including Microsoft Learn...",https://github.com/Azure/azure-quickstart-templates,github.com
+2026-02-10,ChatGPT,gpt-4-turbo,002,What is Azure Virtual Network peering?,"Azure Virtual Network peering enables connectivity...",https://learn.microsoft.com/azure/virtual-network/,learn.microsoft.com
+2026-02-10,ChatGPT,gpt-4-turbo,002,What is Azure Virtual Network peering?,"Azure Virtual Network peering enables connectivity...",https://stackoverflow.com/questions/azure-vnet,stackoverflow.com
+2026-02-10,Gemini,gemini-1.5-pro,002,What is Azure Virtual Network peering?,"Based on Microsoft documentation...",https://learn.microsoft.com/en-us/azure/,learn.microsoft.com
+2026-02-10,Perplexity,llama-3.1-sonar-small-128k-online,002,What is Azure Virtual Network peering?,"According to official sources...",https://docs.microsoft.com/azure/,learn.microsoft.com`;
                     
+                    console.log('[DEBUG] Using hardcoded sample data');
                     parseAndDisplayResults(sampleData);
                     showStatus('info', 'Showing demo data. Real benchmark results will appear here once GitHub Actions runs successfully.');
                 }
                 
             } catch (error) {
-                console.error('Error loading results:', error);
-                showStatus('error', 'Error loading benchmark results. Check browser console for details.');
+                console.error('[DEBUG] Error loading results:', error);
+                showStatus('error', 'Error loading benchmark results: ' + error.message);
             }
         }
 
         function parseAndDisplayResults(csvText) {
+            console.log('[DEBUG] Parsing CSV data, length:', csvText.length);
+            console.log('[DEBUG] CSV preview:', csvText.substring(0, 200));
+            
             Papa.parse(csvText, {
                 header: true,
                 complete: function(results) {
+                    console.log('[DEBUG] Papa.parse complete, total rows:', results.data.length);
+                    console.log('[DEBUG] Sample row:', results.data[0]);
+                    
                     currentData = results.data.filter(row => row.date && row.provider);
-                    updateDashboard();
-                    updateCharts();
-                    updateTable();
-                    showStatus('success', `Loaded ${currentData.length} results`);
+                    console.log('[DEBUG] Filtered data length:', currentData.length);
+                    
+                    if (currentData.length > 0) {
+                        updateDashboard();
+                        updateCharts();
+                        updateTable();
+                        showStatus('success', `Loaded ${currentData.length} results`);
+                        console.log('[DEBUG] Dashboard update complete');
+                    } else {
+                        console.log('[DEBUG] No valid data rows found');
+                        showStatus('error', 'No valid data found in CSV file');
+                    }
+                },
+                error: function(error) {
+                    console.error('[DEBUG] Papa.parse error:', error);
+                    showStatus('error', 'Error parsing CSV data: ' + error.message);
                 }
             });
         }
 
         function updateDashboard() {
+            console.log('[DEBUG] Updating dashboard with data length:', currentData.length);
+            
             const totalResponses = currentData.filter(row => row.citation_url !== 'NONE' && row.citation_url !== 'ERROR').length;
             const learnCitations = currentData.filter(row => row.citation_domain === 'learn.microsoft.com').length;
             const citationRate = totalResponses > 0 ? Math.round((learnCitations / totalResponses) * 100) : 0;
 
-            document.getElementById('totalResponses').textContent = currentData.length;
-            document.getElementById('citationRate').textContent = citationRate;
+            console.log('[DEBUG] Dashboard metrics:', { totalResponses, learnCitations, citationRate });
+            
+            // Update dashboard elements
+            const totalEl = document.getElementById('totalResponses');
+            const rateEl = document.getElementById('citationRate');
+            
+            if (totalEl) {
+                totalEl.textContent = currentData.length;
+                console.log('[DEBUG] Updated totalResponses to:', currentData.length);
+            } else {
+                console.error('[DEBUG] totalResponses element not found');
+            }
+            
+            if (rateEl) {
+                rateEl.textContent = citationRate + '%';
+                console.log('[DEBUG] Updated citationRate to:', citationRate + '%');
+            } else {
+                console.error('[DEBUG] citationRate element not found');
+            }
         }
 
         function updateCharts() {
-            updateProviderChart();
-            updateDomainChart();
+            console.log('[DEBUG] Updating charts...');
+            try {
+                updateProviderChart();
+                updateDomainChart();
+                console.log('[DEBUG] Charts updated successfully');
+            } catch (error) {
+                console.error('[DEBUG] Error updating charts:', error);
+                showStatus('error', 'Error updating charts: ' + error.message);
+            }
         }
 
         function updateProviderChart() {
-            const providers = {};
-            currentData.forEach(row => {
-                if (!providers[row.provider]) {
-                    providers[row.provider] = { total: 0, learn: 0 };
-                }
-                if (row.citation_url !== 'NONE' && row.citation_url !== 'ERROR') {
-                    providers[row.provider].total++;
-                    if (row.citation_domain === 'learn.microsoft.com') {
-                        providers[row.provider].learn++;
+            console.log('[DEBUG] Updating provider chart...');
+            try {
+                const providers = {};
+                currentData.forEach(row => {
+                    if (!providers[row.provider]) {
+                        providers[row.provider] = { total: 0, learn: 0 };
                     }
+                    if (row.citation_url !== 'NONE' && row.citation_url !== 'ERROR') {
+                        providers[row.provider].total++;
+                        if (row.citation_domain === 'learn.microsoft.com') {
+                            providers[row.provider].learn++;
+                        }
+                    }
+                });
+
+                const labels = Object.keys(providers);
+                const data = labels.map(provider => 
+                    providers[provider].total > 0 ? 
+                    Math.round((providers[provider].learn / providers[provider].total) * 100) : 0
+                );
+
+                console.log('[DEBUG] Provider chart data:', { labels, data, providers });
+
+                const chartElement = document.getElementById('providerChart');
+                if (!chartElement) {
+                    console.error('[DEBUG] providerChart element not found');
+                    return;
                 }
-            });
 
-            const labels = Object.keys(providers);
-            const data = labels.map(provider => 
-                providers[provider].total > 0 ? 
-                Math.round((providers[provider].learn / providers[provider].total) * 100) : 0
-            );
-
-            const ctx = document.getElementById('providerChart').getContext('2d');
-            if (providerChart) {
-                providerChart.destroy();
+                const ctx = chartElement.getContext('2d');
+                if (providerChart) {
+                    providerChart.destroy();
+                }
+                
+                providerChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Learn Citation Rate (%)',
+                            data: data,
+                            backgroundColor: ['#0078d4', '#00bcf2', '#40e0d0']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100
+                            }
+                        }
+                    }
+                });
+                
+                console.log('[DEBUG] Provider chart created successfully');
+            } catch (error) {
+                console.error('[DEBUG] Error creating provider chart:', error);
             }
-            
-            providerChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Learn Citation Rate (%)',
-                        data: data,
-                        backgroundColor: ['#0078d4', '#00bcf2', '#40e0d0']
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 100
+        }
                         }
                     }
                 }
