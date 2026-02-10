@@ -348,6 +348,11 @@ def call_gemini_api(prompt: str) -> Tuple[str, List[str]]:
                     if finish_reason in ['SAFETY', 'BLOCKED', 'RECITATION']:
                         print(f"[DEBUG] Gemini response was filtered due to: {finish_reason}")
                 
+                # Extract text content from the candidate
+                if 'content' in candidate and 'parts' in candidate['content']:
+                    for part in candidate['content']['parts']:
+                        if 'text' in part:
+                            response_text += part['text']
                 
                 if response_text:
                     print(f"[DEBUG] Gemini API call successful with model: {model_name}")
@@ -375,16 +380,20 @@ def call_gemini_api(prompt: str) -> Tuple[str, List[str]]:
             elif response.status_code == 404:
                 print(f"[DEBUG] Model {model_name} not found, trying next...")
                 continue
-        elif response.status_code == 429:
-            error_text = response.text if hasattr(response, 'text') else 'No error details'
-            print(f"[DEBUG] Gemini API rate limit exceeded with {model_name}: {error_text[:200]}...")
-            # For rate limits, we might want to try a different model
-            continue
-        elif response.status_code == 403:
-            error_text = response.text if hasattr(response, 'text') else 'No error details'
-            print(f"[DEBUG] Gemini API quota/permission error with {model_name}: {error_text[:200]}...")
-            # For quota errors, likely affects all models, so we can break early
-            break
+            elif response.status_code == 429:
+                error_text = response.text if hasattr(response, 'text') else 'No error details'
+                print(f"[DEBUG] Gemini API rate limit exceeded with {model_name}: {error_text[:200]}...")
+                # For rate limits, we might want to try a different model
+                continue
+            elif response.status_code == 403:
+                error_text = response.text if hasattr(response, 'text') else 'No error details'
+                print(f"[DEBUG] Gemini API quota/permission error with {model_name}: {error_text[:200]}...")
+                # For quota errors, likely affects all models, so we can break early
+                break
+            else:
+                error_text = response.text if hasattr(response, 'text') else 'No error details'
+                print(f"[DEBUG] Gemini API error {response.status_code} with {model_name}: {error_text[:200]}...")
+                continue
                 
         except Exception as e:
             print(f"[DEBUG] Exception with model {model_name}: {type(e).__name__}: {str(e)}")

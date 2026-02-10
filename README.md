@@ -1,5 +1,6 @@
 # AI Citation Tool
 
+<!-- Updated: 2026-02-10 12:00 UTC -->
 Benchmark tool that tests how **learn.microsoft.com** is cited by ChatGPT, Gemini, and Perplexity.
 
 ## 🚀 Quick Start
