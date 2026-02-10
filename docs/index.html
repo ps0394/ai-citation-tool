@@ -303,6 +303,16 @@
             <h3>Top Domains Cited</h3>
             <canvas id="domainChart"></canvas>
         </div>
+
+        <div class="widget">
+            <h3>📈 Citation Trends</h3>
+            <div style="margin-bottom: 10px; text-align: center;">
+                <button onclick="loadTrendChart(7)" style="margin: 0 5px; padding: 5px 10px; border: 1px solid #0078d4; background: white; color: #0078d4; border-radius: 3px; cursor: pointer;">7 Days</button>
+                <button onclick="loadTrendChart(30)" style="margin: 0 5px; padding: 5px 10px; border: 1px solid #0078d4; background: #0078d4; color: white; border-radius: 3px; cursor: pointer;">30 Days</button>
+                <button onclick="loadTrendChart(90)" style="margin: 0 5px; padding: 5px 10px; border: 1px solid #0078d4; background: white; color: #0078d4; border-radius: 3px; cursor: pointer;">90 Days</button>
+            </div>
+            <canvas id="trendChart" height="400"></canvas>
+        </div>
     </div>
 
     <!-- Enhanced Prompt Explorer Section -->
@@ -348,6 +358,184 @@
         let currentData = [];
         let providerChart = null;
         let domainChart = null;
+        let trendChart = null;
+
+        // Daily aggregation function for time-series analysis
+        function aggregateDailyData(csvData, date) {
+            const dayData = csvData.filter(row => row.date === date);
+            const providers = {};
+            
+            dayData.forEach(row => {
+                if (!providers[row.provider]) {
+                    providers[row.provider] = { total: 0, learn: 0 };
+                }
+                if (row.citation_url !== 'NONE' && row.citation_url !== 'ERROR') {
+                    providers[row.provider].total++;
+                    if (row.citation_domain === 'learn.microsoft.com') {
+                        providers[row.provider].learn++;
+                    }
+                }
+            });
+
+            // Calculate citation rates
+            const rates = {};
+            let totalCitations = 0;
+            let totalLearnCitations = 0;
+
+            Object.keys(providers).forEach(provider => {
+                const rate = providers[provider].total > 0 ? 
+                    (providers[provider].learn / providers[provider].total) * 100 : 0;
+                rates[provider] = Math.round(rate * 10) / 10; // Round to 1 decimal
+                totalCitations += providers[provider].total;
+                totalLearnCitations += providers[provider].learn;
+            });
+
+            rates.overall = totalCitations > 0 ? 
+                Math.round((totalLearnCitations / totalCitations) * 1000) / 10 : 0;
+
+            return {
+                date: date,
+                rates: rates,
+                totalCitations: totalCitations
+            };
+        }
+
+        // Historical data loader for time-series charts
+        async function loadHistoricalData(days = 30) {
+            const historicalData = [];
+            const today = new Date();
+            
+            for (let i = 0; i < days; i++) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i);
+                const dateStr = date.toISOString().split('T')[0];
+                
+                try {
+                    const response = await fetch(`data/results_${dateStr}.csv`);
+                    if (response.ok) {
+                        const csvText = await response.text();
+                        const data = Papa.parse(csvText, { header: true }).data;
+                        const dailyAgg = aggregateDailyData(data, dateStr);
+                        historicalData.unshift(dailyAgg); // Add to beginning for chronological order
+                    }
+                } catch (e) {
+                    // File doesn't exist for this date, continue
+                    console.log(`No data file found for ${dateStr}`);
+                }
+            }
+            
+            return historicalData;
+        }
+
+        // Trend chart implementation
+        async function loadTrendChart(days = 30) {
+            try {
+                showStatus('info', `Loading ${days} days of historical data...`);
+                const historicalData = await loadHistoricalData(days);
+                
+                if (historicalData.length === 0) {
+                    showStatus('error', 'No historical data available for trend analysis');
+                    return;
+                }
+
+                const labels = historicalData.map(d => d.date);
+                const datasets = [
+                    {
+                        label: 'Overall Citation Rate',
+                        data: historicalData.map(d => d.rates.overall || 0),
+                        borderColor: '#0078d4',
+                        backgroundColor: 'rgba(0, 120, 212, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.1
+                    }
+                ];
+
+                // Add provider-specific lines if we have data
+                const providers = ['ChatGPT', 'Gemini', 'Perplexity'];
+                const providerColors = ['#10a37f', '#4285f4', '#20b2aa'];
+                
+                providers.forEach((provider, index) => {
+                    const data = historicalData.map(d => d.rates[provider] || 0);
+                    if (data.some(value => value > 0)) {
+                        datasets.push({
+                            label: provider,
+                            data: data,
+                            borderColor: providerColors[index],
+                            backgroundColor: 'transparent',
+                            borderWidth: 2,
+                            tension: 0.1
+                        });
+                    }
+                });
+
+                const ctx = document.getElementById('trendChart').getContext('2d');
+                if (trendChart) {
+                    trendChart.destroy();
+                }
+                
+                trendChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: datasets
+                    },
+                    options: {
+                        responsive: true,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false,
+                        },
+                        scales: {
+                            x: {
+                                display: true,
+                                title: {
+                                    display: true,
+                                    text: 'Date'
+                                },
+                                type: 'category'
+                            },
+                            y: {
+                                display: true,
+                                title: {
+                                    display: true,
+                                    text: 'Citation Rate (%)'
+                                },
+                                beginAtZero: true,
+                                max: 100
+                            }
+                        },
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: `Citation Rate Trends (Last ${days} Days)`
+                            },
+                            legend: {
+                                display: true,
+                                position: 'bottom'
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                titleColor: 'white',
+                                bodyColor: 'white',
+                                callbacks: {
+                                    afterBody: function(context) {
+                                        const dataIndex = context[0].dataIndex;
+                                        const dayData = historicalData[dataIndex];
+                                        return `Total citations: ${dayData.totalCitations}`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                showStatus('success', `Loaded ${historicalData.length} days of trend data`);
+            } catch (error) {
+                console.error('Error loading trend chart:', error);
+                showStatus('error', 'Failed to load trend data: ' + error.message);
+            }
+        }
 
         async function loadLatestResults() {
             try {
@@ -996,7 +1184,8 @@
         // Load data when page loads
         document.addEventListener('DOMContentLoaded', () => {
             loadLatestResults();
-            loadEnhancedData();
+            // loadEnhancedData(); // Comment out if function doesn't exist yet
+            loadTrendChart(30); // Load 30 days of trend data by default
         });
     </script>
 </body>
