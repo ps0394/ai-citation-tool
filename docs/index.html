@@ -359,6 +359,11 @@
         let providerChart = null;
         let domainChart = null;
         let trendChart = null;
+        
+        // Enhanced prompt analysis variables
+        let enhancedData = null;
+        let currentPage = 1;
+        let promptsPerPage = 5;
 
         // Daily aggregation function for time-series analysis
         function aggregateDailyData(csvData, date) {
@@ -535,6 +540,223 @@
                 console.error('Error loading trend chart:', error);
                 showStatus('error', 'Failed to load trend data: ' + error.message);
             }
+        }
+
+        // Enhanced data loader for detailed prompt analysis
+        async function loadEnhancedData() {
+            try {
+                // Try to load JSON file first (has more detailed structure)
+                const today = new Date().toISOString().split('T')[0];
+                let jsonData = null;
+                
+                // Try today's JSON file
+                try {
+                    const response = await fetch(`data/results_${today}.json`);
+                    if (response.ok) {
+                        jsonData = await response.json();
+                    }
+                } catch (e) {
+                    console.log('Today JSON file not found, trying yesterday...');
+                }
+                
+                // Try yesterday's JSON file if today's doesn't exist
+                if (!jsonData) {
+                    const yesterday = new Date();
+                    yesterday.setDate(yesterday.getDate() - 1);
+                    const yesterdayStr = yesterday.toISOString().split('T')[0];
+                    try {
+                        const response = await fetch(`data/results_${yesterdayStr}.json`);
+                        if (response.ok) {
+                            jsonData = await response.json();
+                        }
+                    } catch (e) {
+                        console.log('Yesterday JSON file not found...');
+                    }
+                }
+                
+                // If we have JSON data, use it
+                if (jsonData && jsonData.enhanced_results) {
+                    enhancedData = jsonData.enhanced_results;
+                    displayEnhancedPrompts();
+                    document.getElementById('dataSource').textContent = `Data loaded from: results_${(jsonData.metadata && jsonData.metadata.date) || today}.json (${enhancedData.prompts.length} prompts)`;
+                } else {
+                    // Fall back to creating enhanced data from CSV
+                    await loadEnhancedFromCSV();
+                }
+            } catch (error) {
+                console.error('Error loading enhanced data:', error);
+                document.getElementById('dataSource').textContent = 'Error loading detailed analysis data';
+            }
+        }
+
+        // Fallback: Create enhanced data structure from CSV
+        async function loadEnhancedFromCSV() {
+            if (currentData.length === 0) {
+                document.getElementById('dataSource').textContent = 'No data available for detailed analysis';
+                return;
+            }
+
+            // Group data by prompt_id
+            const promptGroups = {};
+            currentData.forEach(row => {
+                if (row.prompt_id && row.prompt) {
+                    if (!promptGroups[row.prompt_id]) {
+                        promptGroups[row.prompt_id] = {
+                            prompt_id: row.prompt_id,
+                            prompt_text: row.prompt,
+                            category: 'general',
+                            providers: {}
+                        };
+                    }
+                    
+                    if (!promptGroups[row.prompt_id].providers[row.provider]) {
+                        promptGroups[row.prompt_id].providers[row.provider] = {
+                            model: row.model || 'unknown',
+                            response_text: row.response || 'No response available',
+                            learn_citations: [],
+                            other_citations: [],
+                            citation_count: { learn: 0, other: 0, total: 0 }
+                        };
+                    }
+                    
+                    const providerData = promptGroups[row.prompt_id].providers[row.provider];
+                    
+                    // Add citation if it exists
+                    if (row.citation_url && row.citation_url !== 'NONE' && row.citation_url !== 'ERROR') {
+                        const citation = {
+                            url: row.citation_url,
+                            domain: row.citation_domain || 'unknown',
+                            title: row.citation_url.split('/').pop() || 'Citation'
+                        };
+                        
+                        if (row.citation_domain === 'learn.microsoft.com') {
+                            providerData.learn_citations.push(citation);
+                            providerData.citation_count.learn++;
+                        } else {
+                            providerData.other_citations.push(citation);
+                            providerData.citation_count.other++;
+                        }
+                        providerData.citation_count.total++;
+                    }
+                });
+            });
+
+            enhancedData = {
+                prompts: Object.values(promptGroups)
+            };
+            
+            displayEnhancedPrompts();
+            document.getElementById('dataSource').textContent = `Data created from CSV (${enhancedData.prompts.length} prompts)`;
+        }
+
+        // Display enhanced prompts with pagination
+        function displayEnhancedPrompts() {
+            if (!enhancedData || !enhancedData.prompts) {
+                document.getElementById('promptsContainer').innerHTML = '<p>No prompt data available</p>';
+                return;
+            }
+
+            const startIndex = (currentPage - 1) * promptsPerPage;
+            const endIndex = startIndex + promptsPerPage;
+            const pagePrompts = enhancedData.prompts.slice(startIndex, endIndex);
+            
+            const container = document.getElementById('promptsContainer');
+            container.innerHTML = '';
+            
+            pagePrompts.forEach((prompt, index) => {
+                const globalIndex = startIndex + index;
+                const card = createPromptCard(prompt, globalIndex);
+                container.appendChild(card);
+            });
+            
+            const totalPages = Math.ceil(enhancedData.prompts.length / promptsPerPage);
+            updatePaginationInfo(totalPages);
+        }
+
+        // Create prompt card (this function seems to exist but might be incomplete)
+        function createPromptCard(prompt, index) {
+            const card = document.createElement('div');
+            card.className = 'prompt-card';
+            
+            const header = document.createElement('div');
+            header.className = 'prompt-header';
+            header.onclick = () => togglePromptDetails(index);
+            
+            const providers = Object.keys(prompt.providers);
+            const totalCitations = providers.reduce((sum, provider) => 
+                sum + (prompt.providers[provider].citation_count?.total || 0), 0);
+            const learnCitations = providers.reduce((sum, provider) => 
+                sum + (prompt.providers[provider].citation_count?.learn || 0), 0);
+            
+            header.innerHTML = `
+                <div class="prompt-title">${prompt.prompt_id}: ${prompt.prompt_text.substring(0, 80)}...</div>
+                <div class="prompt-summary">
+                    ${providers.map(provider => {
+                        const providerData = prompt.providers[provider];
+                        const citationCount = providerData.citation_count?.total || 0;
+                        const learnCount = providerData.citation_count?.learn || 0;
+                        return `
+                            <span class="provider-badge provider-${provider.toLowerCase()}" 
+                                  onclick="event.stopPropagation(); toggleProviderDetails(${index}, '${provider}')">
+                                ${provider}: ${citationCount} citations (${learnCount} learn.microsoft.com)
+                            </span>
+                        `;
+                    }).join('')}
+                </div>
+                <span id="chevron-${index}" class="chevron">▼</span>
+            `;
+            
+            const details = document.createElement('div');
+            details.className = 'prompt-details';
+            details.id = `details-${index}`;
+            details.style.display = 'none';
+            
+            providers.forEach(provider => {
+                const providerData = prompt.providers[provider];
+                const providerDiv = document.createElement('div');
+                providerDiv.className = 'provider-details';
+                providerDiv.id = `provider-${index}-${provider}`;
+                providerDiv.style.display = 'none';
+                
+                providerDiv.innerHTML = `
+                    <h4>🤖 ${provider} (${providerData.model})</h4>
+                    <div class="response-text">
+                        <strong>Response:</strong><br>
+                        ${providerData.response_text.substring(0, 500)}${providerData.response_text.length > 500 ? '...' : ''}
+                    </div>
+                    <div class="citations-section">
+                        <div class="citation-group learn-citations">
+                            <h4>📚 Learn.microsoft.com Citations</h4>
+                            <ul class="citation-list">
+                                ${(providerData.learn_citations || []).map(citation => `
+                                    <li class="citation-item">
+                                        <a href="${citation.url}" class="citation-link" target="_blank">${citation.title}</a>
+                                        <div class="citation-domain">${citation.domain}</div>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                            ${(providerData.learn_citations || []).length === 0 ? '<p><em>No learn.microsoft.com citations found</em></p>' : ''}
+                        </div>
+                        <div class="citation-group other-citations">
+                            <h4>🌐 Other Citations</h4>
+                            <ul class="citation-list">
+                                ${(providerData.other_citations || []).map(citation => `
+                                    <li class="citation-item">
+                                        <a href="${citation.url}" class="citation-link" target="_blank">${citation.title}</a>
+                                        <div class="citation-domain">${citation.domain}</div>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                            ${(providerData.other_citations || []).length === 0 ? '<p><em>No other citations found</em></p>' : ''}
+                        </div>
+                    </div>
+                `;
+                details.appendChild(providerDiv);
+            });
+
+            card.appendChild(header);
+            card.appendChild(details);
+            return card;
         }
 
         async function loadLatestResults() {
@@ -1142,6 +1364,9 @@
         }
 
         function changePage(direction) {
+            if (!enhancedData || !enhancedData.prompts) {
+                return; // No data to paginate
+            }
             const totalPages = Math.ceil(enhancedData.prompts.length / promptsPerPage);
             currentPage = Math.max(1, Math.min(totalPages, currentPage + direction));
             displayEnhancedPrompts();
@@ -1184,7 +1409,7 @@
         // Load data when page loads
         document.addEventListener('DOMContentLoaded', () => {
             loadLatestResults();
-            // loadEnhancedData(); // Comment out if function doesn't exist yet
+            loadEnhancedData(); // Load detailed prompt analysis
             loadTrendChart(30); // Load 30 days of trend data by default
         });
     </script>
