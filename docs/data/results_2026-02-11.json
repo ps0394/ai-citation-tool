@@ -1,0 +1,630 @@
+{
+  "metadata": {
+    "date": "2026-02-11",
+    "timestamp": "2026-02-11T09:49:34.323219",
+    "total_prompts": 10,
+    "benchmark_version": "2.0"
+  },
+  "prompts": [
+    {
+      "prompt_id": "001",
+      "prompt_text": "How do I deploy an Azure Function using Bicep?",
+      "category": "how-to",
+      "providers": {
+        "ChatGPT": {
+          "model": "gpt-4-turbo",
+          "response_text": "Deploying an Azure Function using Bicep can be accomplished by defining a Bicep template that describes the Azure Function resource, its hosting plan, and other necessary configurations. Below is a step-by-step guide on how to do this, along with related documentation links.\n\n### Step 1: Install the Bicep CLI\n\nBefore you start, you need to install the Bicep CLI if you haven't already. You can find the installation instructions here:\n- [Bicep Install Guide](https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/install)\n\n### Step 2: Create a Bicep Template\n\nBelow is an example Bicep template for deploying an Azure Function App with a consumption plan:\n\n```bicep\n@description('The name of the function app.')\nparam functionAppName string\n\n@description('The location for the function app.')\nparam location string = resourceGroup().location\n\n@description('The resource group name of the storage account.')\nparam storageAccountName string\n\n@description('The SKUs of the hosting plan for the function app.')\nparam hostingPlanSku string = 'Y1'\n\nresource storage 'Microsoft.Storage/storageAccounts@2021-09-01' existing = {\n  name: storageAccountName\n}\n\nresource app 'Microsoft.Web/sites@2021-02-01' = {\n  name: functionAppName\n  location: location\n  kind: 'functionapp'\n  properties: {\n    serverFarmId: hostingPlan.id\n    httpsOnly: true\n    storageAccount: storage.id\n  }\n}\n\nresource hostingPlan 'Microsoft.Web/serverfarms@2021-02-01' = {\n  name: '${functionAppName}-plan'\n  location: location\n  sku: {\n    name: hostingPlanSku\n    tier: 'Dynamic'\n    capacity: 0  // Using consumption plan\n  }\n  properties: {\n    name: '${functionAppName}-plan'\n    hostingEnvironmentProfile: null\n  }\n}\n\noutput functionAppUrl string = app.defaultHostName\n```\n\n### Step 3: Deploy the Bicep File\n\nYou can deploy the Bicep file using the Azure CLI. Make sure you are logged in to your Azure account and then use the following command:\n\n```bash\naz deployment group create --resource-group yourResourceGroup --template-file yourTemplate.bicep --parameters functionAppName='yourFunctionApp' storageAccountName='yourStorageAccount'\n```\n\n### Step 4: Verify Deployment\n\nAfter executing the command, check the Azure portal to see if the Function App was created successfully.\n\n### Additional References\n\n1. **Bicep Documentation**: https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/\n2. **Azure Functions Documentation**: https://docs.microsoft.com/en-us/azure/azure-functions/\n3. **Azure CLI for Bicep**: https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/deploy-azure-cli\n\nThis will help you deploy an Azure Function App using Bicep. If you have any other questions or need further assistance, feel free to ask!",
+          "learn_citations": [
+            {
+              "url": "https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/install)",
+              "domain": "learn.microsoft.com",
+              "title": "Install)"
+            },
+            {
+              "url": "https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/",
+              "domain": "learn.microsoft.com",
+              "title": "Bicep"
+            },
+            {
+              "url": "https://docs.microsoft.com/en-us/azure/azure-functions/",
+              "domain": "learn.microsoft.com",
+              "title": "Azure Functions"
+            },
+            {
+              "url": "https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/deploy-azure-cli",
+              "domain": "learn.microsoft.com",
+              "title": "Deploy Azure Cli"
+            }
+          ],
+          "other_citations": [],
+          "citation_count": {
+            "learn": 4,
+            "other": 0,
+            "total": 4
+          }
+        },
+        "Gemini": {
+          "model": "gemini-auto",
+          "response_text": "Deploying an Azure Function using Bicep provides an Infrastructure-as-Code (IaC) approach, allowing you to define, deploy, and manage your Azure Function infrastructure in a declarative and repeatable manner. This comprehensive guide will walk you through the process, including a detailed Bicep template, deployment steps, and best practices, along with relevant official Microsoft documentation links.\n\n---\n\n## Table of Contents\n\n1.  [Introduction to Bicep for Azure Functions](#1-introduction-to-bicep-for-azure-functions)\n2.  [Prerequisites](#2-prerequisites)\n3.  [Core Azure Resources for",
+          "learn_citations": [],
+          "other_citations": [],
+          "citation_count": {
+            "learn": 0,
+            "other": 0,
+            "total": 0
+          }
+        },
+        "Perplexity": {
+          "model": "llama-3.1-sonar-small-128k-online",
+          "response_text": "API key not configured or requests not available",
+          "learn_citations": [],
+          "other_citations": [],
+          "citation_count": {
+            "learn": 0,
+            "other": 0,
+            "total": 0
+          }
+        }
+      }
+    },
+    {
+      "prompt_id": "002",
+      "prompt_text": "What is Azure Virtual Network peering?",
+      "category": "concept",
+      "providers": {
+        "ChatGPT": {
+          "model": "gpt-4-turbo",
+          "response_text": "Azure Virtual Network peering is a service that allows you to connect two Azure Virtual Networks (VNets) in the same region or across different regions. This means that resources in one VNet can communicate with resources in another VNet seamlessly, as if they were part of the same network, without requiring a gateway.\n\n### Key Features of Azure Virtual Network Peering\n\n1. **Direct Connectivity**: Peering allows direct traffic between the virtual networks, which can help reduce latency and increase throughput.\n\n2. **Private IP Addressing**: Resources in both VNets can communicate using their private IP addresses, eliminating the need for public IP addresses.\n\n3. **No Bandwidth Limit**: There is no bandwidth limit imposed on the traffic between the peer networks.\n\n4. **Global and regional**: You can set up virtual network peering within the same region or across different Azure regions, enabling cross-region communication.\n\n5. **Transitive Routing**: Azure virtual network peering does not support transitive routing. If you have VNet A peered with VNet B, and VNet B with VNet C, VNet A cannot communicate directly with VNet C.\n\n6. **Resource Access**: You can create resources such as virtual machines (VMs) in one VNet and access resources in another VNet without any extra configuration.\n\n### How to Implement VNet Peering\n\nTo implement Azure VNet peering, you typically follow these steps:\n\n1. Go to the Azure portal.\n2. Select the virtual network you want to peer.\n3. In the settings, select 'Peerings' and then 'Add'.\n4. Fill in the required configurations such as the name of the peering, subscription, and the virtual network to peer with.\n5. Confirm and create the peering configuration.\n\n### Pricing\n\nThere may be charges for the data transfer between peered VNets, especially if they are in different regions. It's essential to review Azure's pricing details for VNet peering.\n\n### Documentation Links\n\n- [Overview of Virtual Network Peering](https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-peering-overview)\n- [Quickstart: Create and connect two Azure virtual networks by using the Azure portal](https://docs.microsoft.com/en-us/azure/virtual-network/quick-create-portal)\n- [Virtual Network Peering Pricing](https://azure.microsoft.com/en-us/pricing/details/virtual-network/)\n\nFor more in-depth information and detailed instructions, please refer to the above URLs. Azure's official documentation is a reliable resource for understanding and implementing Virtual Network peering effectively.",
+          "learn_citations": [
+            {
+              "url": "https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-peering-overview)",
+              "domain": "learn.microsoft.com",
+              "title": "Virtual Network Peering Overview)"
+            },
+            {
+              "url": "https://docs.microsoft.com/en-us/azure/virtual-network/quick-create-portal)",
+              "domain": "learn.microsoft.com",
+              "title": "Quick Create Portal)"
+            }
+          ],
+          "other_citations": [
+            {
+              "url": "https://azure.microsoft.com/en-us/pricing/details/virtual-network/)",
+              "domain": "azure.microsoft.com",
+              "title": ")"
+            }
+          ],
+          "citation_count": {
+            "learn": 2,
+            "other": 1,
+            "total": 3
+          }
+        },
+        "Gemini": {
+          "model": "gemini-auto",
+          "response_text": "Azure Virtual Network (VNet) peering is a mechanism that allows you to connect two or more Azure Virtual Networks seamlessly. Once peered, the virtual networks appear as one for connectivity purposes, enabling resources in different VNets to communicate with each other directly, using private IP addresses, as if they were part of the same network.\n\nThis connectivity is low-latency, high-bandwidth, and private,",
+          "learn_citations": [],
+          "other_citations": [],
+          "citation_count": {
+            "learn": 0,
+            "other": 0,
+            "total": 0
+          }
+        },
+        "Perplexity": {
+          "model": "llama-3.1-sonar-small-128k-online",
+          "response_text": "API key not configured or requests not available",
+          "learn_citations": [],
+          "other_citations": [],
+          "citation_count": {
+            "learn": 0,
+            "other": 0,
+            "total": 0
+          }
+        }
+      }
+    },
+    {
+      "prompt_id": "003",
+      "prompt_text": "Azure Functions vs Logic Apps — when should I use each?",
+      "category": "comparison",
+      "providers": {
+        "ChatGPT": {
+          "model": "gpt-4-turbo",
+          "response_text": "Azure Functions and Logic Apps are both part of Azure's serverless computing offerings, but they serve different purposes and use cases. Understanding when to use each can help you design more efficient cloud solutions.\n\n### Azure Functions\n\n**What it is:**\nAzure Functions is a serverless compute service that allows you to run event-driven code without the need to manage infrastructure. It's ideal for scenarios where you need to execute custom code in response to events or on a schedule.\n\n**When to use Azure Functions:**\n- **Custom business logic:** Use Azure Functions when you need to implement complex business logic or custom processing that is not easily achievable with predefined connectors.\n- **Event-driven architectures:** Functions are perfect for reacting to various events, such as changes in data (e.g., new entries in a database), triggers from services like blob storage or queues, and HTTP requests.\n- **Microservices:** Functions can be part of a microservices architecture where each function serves a specific purpose or service.\n- **Short-lived tasks:** Functions are ideal for executing short-lived, stateless operations.\n\n**Documentation:**\n- [Azure Functions Overview](https://docs.microsoft.com/en-us/azure/functions/functions-overview)\n- [Use Cases for Azure Functions](https://docs.microsoft.com/en-us/azure/architecture/patterns/serverless)\n\n### Logic Apps\n\n**What it is:**\nAzure Logic Apps is a cloud-based service that enables you to build workflows and integrate applications and services with minimal coding. It uses a visual designer and pre-built connectors to streamline integration processes.\n\n**When to use Logic Apps:**\n- **Integration scenarios:** Logic Apps are best suited for orchestrating workflows that involve multiple services or applications without the need for custom coding.\n- **Data transformation and movement:** If you need to automate the movement and transformation of data between applications, Logic Apps provides built-in connectors for easy integration.\n- **Long-running workflows:** Logic Apps can handle long-running processes and manage state over time, which is beneficial for workflows that span hours or days.\n- **Business process automation:** Use Logic Apps for automating business processes, approvals, and notifications where visual representation and tracking are beneficial.\n\n**Documentation:**\n- [Azure Logic Apps Overview](https://docs.microsoft.com/en-us/azure/logic-apps/logic-apps-overview)\n- [When to use Azure Logic Apps](https://docs.microsoft.com/en-us/azure/logic-apps/logic-apps-design-what-is-logic-apps)\n\n### Key Differences\n\n- **Coding vs. No Coding:** Azure Functions typically requires coding in languages like C#, JavaScript, or Python, while Logic Apps provide a low-code/no-code solution.\n- **Trigger Types:** Functions are triggered by events, while Logic Apps can be started by both events and schedules.\n- **Use Case Suitability:** Functions are suited for lightweight, event-driven services, while Logic Apps excel in orchestrating processes and integrating services.\n\n### Conclusion\n\nIn summary, choose **Azure Functions** for custom code and event-driven tasks, and opt for **Logic Apps** when you need to integrate multiple systems and automate workflows visually. Understanding these use cases can significantly enhance your design and implementation strategy in Azure.\n\nFor more details, here are the relevant documentation links:\n- [Azure Functions Documentation](https://docs.microsoft.com/en-us/azure/functions/)\n- [Azure Logic Apps Documentation](https://docs.microsoft.com/en-us/azure/logic-apps/)",
+          "learn_citations": [
+            {
+              "url": "https://docs.microsoft.com/en-us/azure/functions/functions-overview)",
+              "domain": "learn.microsoft.com",
+              "title": "Functions Overview)"
+            },
+            {
+              "url": "https://docs.microsoft.com/en-us/azure/architecture/patterns/serverless)",
+              "domain": "learn.microsoft.com",
+              "title": "Serverless)"
+            },
+            {
+              "url": "https://docs.microsoft.com/en-us/azure/logic-apps/logic-apps-overview)",
+              "domain": "learn.microsoft.com",
+              "title": "Logic Apps Overview)"
+            },
+            {
+              "url": "https://docs.microsoft.com/en-us/azure/logic-apps/logic-apps-design-what-is-logic-apps)",
+              "domain": "learn.microsoft.com",
+              "title": "Logic Apps Design What Is Logic Apps)"
+            },
+            {
+              "url": "https://docs.microsoft.com/en-us/azure/functions/)",
+              "domain": "learn.microsoft.com",
+              "title": ")"
+            },
+            {
+              "url": "https://docs.microsoft.com/en-us/azure/logic-apps/)",
+              "domain": "learn.microsoft.com",
+              "title": ")"
+            }
+          ],
+          "other_citations": [],
+          "citation_count": {
+            "learn": 6,
+            "other": 0,
+            "total": 6
+          }
+        },
+        "Gemini": {
+          "model": "gemini-auto",
+          "response_text": "Of course. Here is a comprehensive answer to the question of when to use Azure Functions versus Azure Logic Apps, complete with specific citations to official Microsoft documentation.\n\n---\n\n### Introduction: The Core Distinction\n\nThe primary way to understand the difference between Azure Functions and Azure Logic Apps is to think in terms of **\"code-first\" vs. \"designer-first.\"**\n\n*   **Azure Functions** is a *serverless compute* service. Its primary purpose is to run custom code in response to events. You are in control of the code.\n*   **Azure Logic Apps** is a *serverless integration* service. Its primary purpose is to orchestrate and automate workflows by connecting disparate systems and services. You are in control of the workflow and its connections.\n\nWhile both are serverless, event-driven services,",
+          "learn_citations": [],
+          "other_citations": [],
+          "citation_count": {
+            "learn": 0,
+            "other": 0,
+            "total": 0
+          }
+        },
+        "Perplexity": {
+          "model": "llama-3.1-sonar-small-128k-online",
+          "response_text": "API key not configured or requests not available",
+          "learn_citations": [],
+          "other_citations": [],
+          "citation_count": {
+            "learn": 0,
+            "other": 0,
+            "total": 0
+          }
+        }
+      }
+    },
+    {
+      "prompt_id": "004",
+      "prompt_text": "Why does my Azure DevOps pipeline fail with error MSB1009?",
+      "category": "troubleshooting",
+      "providers": {
+        "ChatGPT": {
+          "model": "gpt-4-turbo",
+          "response_text": "The error `MSB1009: Project file does not exist` in an Azure DevOps pipeline typically indicates that the build process is unable to locate the specified project file (such as a `.csproj` or `.sln` file) that is necessary for the build to proceed. This can happen due to several reasons:\n\n1. **Incorrect Path:** The path to the project file specified in the build task configuration might be incorrect. Double-check the path specified in the pipeline configuration to ensure it points to the correct location.\n\n2. **File Not Committed:** Ensure that the project file is actually included in the repository and has been committed. Sometimes files might be missing from the repository if they were not added or committed properly.\n\n3. **Repository Structure Change:** If there have been changes to the directory structure of the repository (e.g., moving files around) and the pipeline configuration hasn't been updated to reflect these changes, you might encounter this error.\n\n4. **Submodules or External Dependencies:** If the project is dependent on submodules or external repositories, make sure these are properly cloned before the build process starts.\n\n5. **YAML Pipeline Configuration:** If you are using a YAML pipeline, review the YAML file for correct definitions and paths to your project files.\n\nTo resolve the issue, you should review the logs from your pipeline run to identify where the error occurs, check the specified path, ensure all necessary files are included in your repository, and update your pipeline configuration accordingly.\n\n### Additional Resources\nHere are some official Microsoft documentation links that can help you troubleshoot this issue:\n\n- [Azure DevOps Pipelines Overview](https://docs.microsoft.com/en-us/azure/devops/pipelines/?view=azure-devops)\n- [MSBuild Project Files](https://docs.microsoft.com/en-us/visualstudio/msbuild/project-file-structure?view=vs-2022)\n- [Troubleshooting CI/CD Issues with Azure DevOps](https://docs.microsoft.com/en-us/azure/devops/pipelines/troubleshooting?view=azure-devops)\n\nMake sure to check these resources and adjust your Azure DevOps setup accordingly to resolve the error.",
+          "learn_citations": [
+            {
+              "url": "https://docs.microsoft.com/en-us/azure/devops/pipelines/?view=azure-devops)",
+              "domain": "learn.microsoft.com",
+              "title": "Pipelines"
+            },
+            {
+              "url": "https://docs.microsoft.com/en-us/visualstudio/msbuild/project-file-structure?view=vs-2022)",
+              "domain": "learn.microsoft.com",
+              "title": "Project File Structure"
+            },
+            {
+              "url": "https://docs.microsoft.com/en-us/azure/devops/pipelines/troubleshooting?view=azure-devops)",
+              "domain": "learn.microsoft.com",
+              "title": "Troubleshooting"
+            }
+          ],
+          "other_citations": [],
+          "citation_count": {
+            "learn": 3,
+            "other": 0,
+            "total": 3
+          }
+        },
+        "Gemini": {
+          "model": "gemini-auto",
+          "response_text": "Of course. Here is a comprehensive answer to the question regarding the `MSB1009` error in Azure DevOps pipelines, complete with explanations, solutions, and official Microsoft documentation links.\n\n---\n\n### Comprehensive Answer: Why does my Azure DevOps pipeline fail with error MSB1009?\n\nThe error `MSB1009: Project file does not exist` is an error message from MSBuild (the Microsoft Build Engine). It is a straightforward error that means MSBuild was invoked but could not find the solution (`.sln`) or project (`.csproj`, `.vbproj`, etc.) file at the path it was given.\n\nIn the context of an Azure DevOps pipeline, this error is almost always due to an incorrect file path caused by a misunderstanding of how the build agent's file system is structured and where your source code is located during a pipeline run.\n\nHere are the most common causes and their solutions.\n\n### Core Concept: The Agent's Working Directory\n\nBefore diving into the causes, it's crucial to understand the agent's file system. When your pipeline runs, Azure DevOps checks out your source code into a specific directory on the build agent. The path to this directory is available through a predefined variable, `$(System.DefaultWorkingDirectory)` or its shorter alias, `$(Build.SourcesDirectory)`.\n\nAny file paths you specify in your pipeline tasks must be relative to this checkout directory.\n\n*   **Microsoft Learn - Predefined variables:** This document lists all the system variables you can use in your pipelines, which is essential for constructing correct paths.\n    *   **URL:** `https://learn.microsoft.com/en-us/azure/devops/pipelines/build/",
+          "learn_citations": [
+            {
+              "url": "https://learn.microsoft.com/en-us/azure/devops/pipelines/build/",
+              "domain": "learn.microsoft.com",
+              "title": "Build"
+            }
+          ],
+          "other_citations": [],
+          "citation_count": {
+            "learn": 1,
+            "other": 0,
+            "total": 1
+          }
+        },
+        "Perplexity": {
+          "model": "llama-3.1-sonar-small-128k-online",
+          "response_text": "API key not configured or requests not available",
+          "learn_citations": [],
+          "other_citations": [],
+          "citation_count": {
+            "learn": 0,
+            "other": 0,
+            "total": 0
+          }
+        }
+      }
+    },
+    {
+      "prompt_id": "005",
+      "prompt_text": "What skills are covered in the AZ-104 certification?",
+      "category": "certification",
+      "providers": {
+        "ChatGPT": {
+          "model": "gpt-4-turbo",
+          "response_text": "The AZ-104 certification, also known as **Microsoft Azure Administrator**, focuses on equipping individuals with the skills required to manage Azure resources effectively. The certification covers a range of skills and knowledge areas essential for administering Azure environments.\n\n### Key Skills Covered in the AZ-104 Certification:\n\n1. **Manage Azure Identity and Governance:**\n   - Manage Azure Active Directory (AD) identities and users.\n   - Configure role-based access control (RBAC).\n   - Configure and manage Azure subscriptions and resource groups.\n\n2. **Implement and Manage Storage:**\n   - Manage Azure storage accounts.\n   - Configure Azure Blob storage and Azure File shares.\n   - Implement storage redundancy and replication options.\n\n3. **Deploy and Manage Azure Compute Resources:**\n   - Create and configure Azure virtual machines (VMs).\n   - Implement Azure Kubernetes Service (AKS).\n   - Manage VM availability, backups, and scaling.\n\n4. **Configure and Manage Virtual Networking:**\n   - Configure virtual networks and subnets.\n   - Implement Azure VPN and ExpressRoute.\n   - Manage network security, including network security groups (NSGs).\n\n5. **Monitor and Back Up Azure Resources:**\n   - Monitor resources with Azure Monitor and Azure Log Analytics.\n   - Implement Azure Backup and Azure Site Recovery.\n\n6. **Implement Security and Compliance:**\n   - Manage Azure security features.\n   - Make use of Azure Policy for compliance and governance.\n\n### Relevant Documentation and Resources:\n\n1. **Microsoft Learn - AZ-104 Certification Skills Measured:**\n   - This official resource outlines the skills measured in the exam.\n   - URL: [Microsoft Learn - AZ-104 Certification Skills Measured](https://learn.microsoft.com/en-us/certifications/exams/az-104)\n\n2. **Microsoft Learn - Learning Path for AZ-104:**\n   - Offers free learning paths that cover the topics included in the AZ-104 certification.\n   - URL: [Microsoft Learn - Azure Administrator Learning Path](https://learn.microsoft.com/en-us/certifications/azure-administrator)\n\n3. **Official Exam Details:**\n   - General information about the AZ-104 certification, including registration and test format.\n   - URL: [Microsoft Certification - AZ-104 Details](https://www.microsoft.com/en-us/learning/certification-overview.aspx)\n\nThese resources will provide you with detailed information about the skills required for the AZ-104 certification and guidance on how to prepare for the exam.",
+          "learn_citations": [
+            {
+              "url": "https://learn.microsoft.com/en-us/certifications/exams/az-104)",
+              "domain": "learn.microsoft.com",
+              "title": "Az 104)"
+            },
+            {
+              "url": "https://learn.microsoft.com/en-us/certifications/azure-administrator)",
+              "domain": "learn.microsoft.com",
+              "title": "Azure Administrator)"
+            }
+          ],
+          "other_citations": [
+            {
+              "url": "https://www.microsoft.com/en-us/learning/certification-overview.aspx)",
+              "domain": "www.microsoft.com",
+              "title": "Certification Overview.Aspx)"
+            }
+          ],
+          "citation_count": {
+            "learn": 2,
+            "other": 1,
+            "total": 3
+          }
+        },
+        "Gemini": {
+          "model": "gemini-auto",
+          "response_text": "Of course. Here is a comprehensive answer detailing the skills covered in the **Exam AZ-104: Microsoft Azure Administrator** certification, complete with official Microsoft Learn documentation and GitHub repository citations.\n\n### Overview of the AZ-104 Certification\n\nThe **AZ-104: Microsoft Azure Administrator** certification is for individuals who implement, manage, and monitor an organization's Microsoft Azure environment. This role, the Azure Administrator, is responsible for managing identity, governance, storage, compute, and virtual networking in a cloud environment, plus provisioning, sizing, monitoring, and adjusting resources as needed.\n\nThe certification validates a candidate's ability to perform these critical technical tasks, making it a foundational and highly respected credential for cloud professionals.\n\n**Primary Official Resource:**\n*   **Exam AZ-104: Microsoft Azure Administrator Page:** This is the central hub for all official information about the exam, including the most current skills outline and links to preparation resources.\n    *   **URL:** `https://learn.microsoft.com/en-us/credentials/certifications/exams/az-104/`\n\n---\n\n### Detailed Breakdown of Skills Measured\n\nThe AZ-104 exam objectives are broken down into five distinct functional groups, each with a specific weighting. Below is a detailed look at the skills covered in each domain, along with direct links to the relevant Microsoft Learn modules.\n\n#### 1. Manage Azure identities and governance (20-25%)\n\nThis domain focuses on the core components of securing and organizing an Azure environment. It covers user identities, access control, and the policies that enforce organizational standards and compliance.\n\n**Key Skills:**\n*   **Manage Microsoft Entra ID (formerly Azure Active Directory):**\n    *   Creating and managing users and groups.\n    *   Managing administrative units.\n    *   Configuring self-service password reset (SSPR).\n    *   Managing device settings and device join types (Microsoft Entra joined, hybrid joined).\n*   **Manage Role-Based Access Control (RBAC):**\n    *   Understanding the hierarchy and inheritance of permissions (Management Groups, Subscriptions, Resource Groups, Resources).\n    *   Assigning built-in RBAC roles (like Contributor, Reader, Owner) to users, groups, and service principals.\n    *   Interpreting permissions and identifying the correct role for a specific task.\n*   **Manage Subscriptions and Governance:**\n    *   Configuring",
+          "learn_citations": [
+            {
+              "url": "https://learn.microsoft.com/en-us/credentials/certifications/exams/az-104/",
+              "domain": "learn.microsoft.com",
+              "title": "Az 104"
+            }
+          ],
+          "other_citations": [],
+          "citation_count": {
+            "learn": 1,
+            "other": 0,
+            "total": 1
+          }
+        },
+        "Perplexity": {
+          "model": "llama-3.1-sonar-small-128k-online",
+          "response_text": "API key not configured or requests not available",
+          "learn_citations": [],
+          "other_citations": [],
+          "citation_count": {
+            "learn": 0,
+            "other": 0,
+            "total": 0
+          }
+        }
+      }
+    },
+    {
+      "prompt_id": "006",
+      "prompt_text": "How do I configure Azure Application Gateway with SSL termination?",
+      "category": "how-to",
+      "providers": {
+        "ChatGPT": {
+          "model": "gpt-4-turbo",
+          "response_text": "Configuring Azure Application Gateway with SSL termination involves several steps to ensure secure traffic handling. Here's a step-by-step guide to help you set it up:\n\n### Step-by-Step Guide\n\n1. **Create an Azure Application Gateway**:\n   - Go to the Azure portal and create a new Application Gateway instance.\n   - In the creation process, you will define various parameters such as name, region, and performance tier.\n\n2. **Configure the Frontend IP Configuration**:\n   - Choose whether you want to use a public or private IP address. For public access, select \"Public\" IP and either create a new IP or use an existing one.\n\n3. **Upload your SSL Certificate**:\n   - In the Azure portal, navigate to the Application Gateway settings.\n   - Under `Listeners`, create or configure a listener for your HTTPS traffic.\n   - For the listener, you need an SSL certificate. If you don’t have one, you can create a self-signed certificate for testing purposes or use a certificate from a trusted certificate authority (CA).\n   - In the listener configuration, you will need to upload the .pfx file, which must include the private key.\n\n4. **Create a Backend Pool**:\n   - Set up a backend pool consisting of your web servers. This can be Azure VMs, Azure App Services, or any other resources.\n   - Make sure that the backend servers are configured to accept HTTP requests (port 80 or any custom port you choose).\n\n5. **Configure HTTP Settings**:\n   - Go to `HTTP settings` and create or modify the settings to direct traffic from the Application Gateway to your backend servers.\n   - Set the **Protocol** to `HTTP`, since you are using SSL termination (the Application Gateway handles the SSL connection).\n\n6. **Create Routing Rules**:\n   - Define the routing rules to map incoming traffic to the backend pool via the HTTP settings. This is where you link the listener with the backend.\n\n7. **Test the Configuration**:\n   - After you have completed the setup, make sure to test the Application Gateway by accessing it via the frontend IP or DNS name.\n\n8. **Monitor and Scale**:\n   - Use Azure Monitor to keep track of the Application Gateway health and performance, and scale it out or up based on your needs.\n\n### Relevant Azure Documentation:\n\n- [Overview of Application Gateway](https://docs.microsoft.com/en-us/azure/application-gateway/overview)\n- [Tutorial: Create an Application Gateway with SSL termination](https://docs.microsoft.com/en-us/azure/application-gateway/tutorial-create-gateway-ssl-termination)\n- [SSL termination with Azure Application Gateway](https://docs.microsoft.com/en-us/azure/application-gateway/ssl-termination)\n- [How to configure SSL certificates for Application Gateway](https://docs.microsoft.com/en-us/azure/application-gateway/ssl-certificates)\n\n### Important Notes:\n\n- Ensure your backend services are configured to accept unencrypted (HTTP) traffic since the SSL is terminated at the Application Gateway.\n- Regularly check for SSL certificate expiration and renew when necessary.\n\nBy following these steps and consulting the provided documentation, you should be able to successfully configure SSL termination on Azure Application Gateway. If you need further information on a specific part of the process, feel free to ask!",
+          "learn_citations": [
+            {
+              "url": "https://docs.microsoft.com/en-us/azure/application-gateway/overview)",
+              "domain": "learn.microsoft.com",
+              "title": "Overview)"
+            },
+            {
+              "url": "https://docs.microsoft.com/en-us/azure/application-gateway/tutorial-create-gateway-ssl-termination)",
+              "domain": "learn.microsoft.com",
+              "title": "Tutorial Create Gateway Ssl Termination)"
+            },
+            {
+              "url": "https://docs.microsoft.com/en-us/azure/application-gateway/ssl-termination)",
+              "domain": "learn.microsoft.com",
+              "title": "Ssl Termination)"
+            },
+            {
+              "url": "https://docs.microsoft.com/en-us/azure/application-gateway/ssl-certificates)",
+              "domain": "learn.microsoft.com",
+              "title": "Ssl Certificates)"
+            }
+          ],
+          "other_citations": [],
+          "citation_count": {
+            "learn": 4,
+            "other": 0,
+            "total": 4
+          }
+        },
+        "Gemini": {
+          "model": "gemini-auto",
+          "response_text": "Of course. Here is a comprehensive guide on how to configure Azure Application Gateway with SSL/TLS termination, complete with concepts, step-by-step instructions, and official Microsoft documentation links.\n\n### Introduction to SSL/TLS Termination\n\n**SSL/TLS termination** is the process where an Application Gateway decrypts incoming HTTPS traffic from a client, inspects it, and then forwards the unencrypted HTTP traffic to the backend servers. This offloads the computationally expensive decryption and encryption tasks from your web servers, simplifying their configuration and certificate management.\n\n**Key Benefits:**\n\n*   **Centralized Certificate Management:** You only need to manage the SSL/TLS certificate on the Application Gateway, not on every backend server.\n*   **Reduced Backend Server Load:** Your web servers are freed from the CPU-intensive task of handling SSL/TLS handshakes and encryption/decryption.\n*   **Enhanced Security with WAF:** Because the traffic is decrypted at the gateway, the Web Application Firewall (WAF) can inspect the full content of the request for threats like SQL injection and cross-site scripting before it reaches your backend.\n*   **Simplified Backend Configuration:** Backend servers can be configured to listen only on HTTP (port 80), simplifying their setup.\n\n---\n\n### Prerequisites\n\nBefore you begin, you need the following:\n\n1.  **An SSL/TLS Certificate:** For production, this should be from a trusted Certificate Authority (CA). For testing, you can use a self-signed certificate. The certificate must be in the **PFX (Personal Information Exchange - .pfx)** format, which includes both the public and private keys. You will also need the password for the PFX file.\n2.  **An Azure Application Gateway:** You need an existing Application Gateway or you can create one during this process. The SKU must be v1 or v2 (Standard or WAF).\n3.  **A Virtual Network (VNet) and Subnet:** The Application Gateway requires its own dedicated subnet within a VNet.\n4.  **Backend Pool:** A configured backend pool pointing to your web servers (e.g., VMs, App Service, IP addresses).\n\n---\n\n### Step-by-Step Configuration using the Azure Portal\n\nThis process involves creating or modifying three key components of the Application Gateway: a **Listener**, a **Backend HTTP Setting**, and a **Routing Rule** to tie them together.\n\n#### Step 1: Upload the SSL Certificate\n\n1.  Navigate to your Application Gateway in the Azure Portal.\n2.  Under **Settings**, select **Listeners**.\n3.  Click the **+ Add listener** button.\n4.  In the **Listener name** field, provide a descriptive name (e.g., `my-https-listener`).\n5.  For **Frontend IP**, select the public IP you want to associate with this listener.\n6.  For **Protocol**, select **HTTPS**. This will reveal the certificate configuration section.\n7.  Under **Certificate**, select **Upload a new certificate**.\n8.  Give the certificate a name (e.g., `my-prod-ssl-cert`).\n9.  For the **PFX certificate file**, browse your local machine and select your `.pfx` file.\n10. Enter the **Password** for the PFX file.\n11. Leave the rest of the listener settings for now. We will complete this in Step 3.\n\n![Uploading a PFX certificate to an Application Gateway Listener](https://learn.microsoft.com/azure/application-gateway/media/create-ssl-portal/add-listener-ssl.png)\n\n> **Official Documentation:**\n> *   **Certificates supported by Application Gateway:** [https://learn.microsoft.com/en-us/azure/application-gateway/ssl-overview#certificates-supported-by-application-gateway](https",
+          "learn_citations": [
+            {
+              "url": "https://learn.microsoft.com/azure/application-gateway/media/create-ssl-portal/add-listener-ssl.png)",
+              "domain": "learn.microsoft.com",
+              "title": "Add Listener Ssl.Png)"
+            },
+            {
+              "url": "https://learn.microsoft.com/en-us/azure/application-gateway/ssl-overview",
+              "domain": "learn.microsoft.com",
+              "title": "Ssl Overview"
+            }
+          ],
+          "other_citations": [],
+          "citation_count": {
+            "learn": 2,
+            "other": 0,
+            "total": 2
+          }
+        },
+        "Perplexity": {
+          "model": "llama-3.1-sonar-small-128k-online",
+          "response_text": "API key not configured or requests not available",
+          "learn_citations": [],
+          "other_citations": [],
+          "citation_count": {
+            "learn": 0,
+            "other": 0,
+            "total": 0
+          }
+        }
+      }
+    },
+    {
+      "prompt_id": "007",
+      "prompt_text": "What is Azure Service Bus and when should I use it?",
+      "category": "concept",
+      "providers": {
+        "ChatGPT": {
+          "model": "gpt-4-turbo",
+          "response_text": "Azure Service Bus is a fully managed enterprise integration message broker designed to facilitate communication between services and applications across cloud and on-premises environments. It supports various messaging patterns, including message queuing, publish/subscribe, and more, allowing different components of a distributed application to communicate with each other asynchronously and reliably.\n\n### Key Features:\n1. **Queueing**: Provides reliable queue functionality, allowing one-to-one communications and ensuring that messages are delivered even if the consuming service is unavailable.\n2. **Topics and Subscriptions**: Supports a publish/subscribe model, where messages can be sent to a topic and forwarded to multiple subscriptions, allowing for one-to-many communications.\n3. **Transactions**: Allows developers to manage complex messaging scenarios by grouping multiple operations into a single transaction.\n4. **Advanced Messaging Features**: Including dead-letter queues for undeliverable messages, duplicate detection, and scheduled delivery.\n5. **Integration with Other Azure Services**: Can easily integrate with Azure Functions, Logic Apps, and more.\n\n### When to Use Azure Service Bus:\n1. **Asynchronous Messaging**: When you have components that need to communicate without being tightly coupled in time so that they can operate independently.\n2. **Decoupled Architecture**: If you design distributed systems or microservices architectures where services need to operate independently and communicate without direct dependencies.\n3. **Reliable Messaging**: If you require guaranteed message delivery, transactions, and message ordering. Service Bus ensures that messages are safe even during failures.\n4. **Multiple Subscribers**: When multiple services need to receive and process the same messages independently (publish/subscribe scenario).\n5. **Load Balancing**: Service Bus queues can be used to load-balance workloads across multiple consumers, improving the system's scalability.\n\n### Documentation and Resources:\n- **Azure Service Bus Overview**: [Azure Service Bus Documentation](https://docs.microsoft.com/en-us/azure/service-bus-service/service-bus-messaging-overview)\n- **Comparison with Other Messaging Solutions**: [Azure Service Bus vs. Other Services](https://docs.microsoft.com/en-us/azure/service-bus-service/service-bus-compare-messaging-services)\n- **Quickstart Guide**: [Quickstart: Use Azure Service Bus queues](https://docs.microsoft.com/en-us/azure/service-bus/service-bus-dotnet-standard-get-started-queues)\n- **Frequently Asked Questions**: [Azure Service Bus FAQ](https://docs.microsoft.com/en-us/azure/service-bus-service/service-bus-messaging-faq)\n\nUsing Azure Service Bus can greatly enhance the reliability, scalability, and maintainability of your applications by offering flexible and robust messaging capabilities.",
+          "learn_citations": [
+            {
+              "url": "https://docs.microsoft.com/en-us/azure/service-bus-service/service-bus-messaging-overview)",
+              "domain": "learn.microsoft.com",
+              "title": "Service Bus Messaging Overview)"
+            },
+            {
+              "url": "https://docs.microsoft.com/en-us/azure/service-bus-service/service-bus-compare-messaging-services)",
+              "domain": "learn.microsoft.com",
+              "title": "Service Bus Compare Messaging Services)"
+            },
+            {
+              "url": "https://docs.microsoft.com/en-us/azure/service-bus/service-bus-dotnet-standard-get-started-queues)",
+              "domain": "learn.microsoft.com",
+              "title": "Service Bus Dotnet Standard Get Started Queues)"
+            },
+            {
+              "url": "https://docs.microsoft.com/en-us/azure/service-bus-service/service-bus-messaging-faq)",
+              "domain": "learn.microsoft.com",
+              "title": "Service Bus Messaging Faq)"
+            }
+          ],
+          "other_citations": [],
+          "citation_count": {
+            "learn": 4,
+            "other": 0,
+            "total": 4
+          }
+        },
+        "Gemini": {
+          "model": "gemini-auto",
+          "response_text": "Of course. Here is a comprehensive answer to the question: \"What is Azure Service Bus and when should I use it?\"\n\n---\n\n## What is Azure Service Bus?\n\nAzure Service Bus is a **fully managed enterprise message broker** offered as a Platform-as-a-Service (PaaS) on Microsoft Azure. Its primary purpose is to enable reliable, asynchronous communication between different applications and services.\n\nThink of it as a sophisticated postal service for your software components. When one application (a \"producer\" or \"sender\") needs to send information to another application (a \"consumer\" or \"receiver\"), it doesn't send it directly. Instead, it drops the message off at a Service Bus \"post office\" (a Queue or a Topic). The receiving application can then pick up that message whenever it's ready.\n\nThis model of indirect, brokered communication is fundamental for building modern, scalable, and resilient distributed systems. It **decouples** applications,",
+          "learn_citations": [],
+          "other_citations": [],
+          "citation_count": {
+            "learn": 0,
+            "other": 0,
+            "total": 0
+          }
+        },
+        "Perplexity": {
+          "model": "llama-3.1-sonar-small-128k-online",
+          "response_text": "API key not configured or requests not available",
+          "learn_citations": [],
+          "other_citations": [],
+          "citation_count": {
+            "learn": 0,
+            "other": 0,
+            "total": 0
+          }
+        }
+      }
+    },
+    {
+      "prompt_id": "008",
+      "prompt_text": "How do I create a custom Azure policy?",
+      "category": "how-to",
+      "providers": {
+        "ChatGPT": {
+          "model": "gpt-4-turbo",
+          "response_text": "Creating a custom Azure policy involves defining the policy rule, specifying the policy parameters if needed, and then assigning the policy to a scope (such as a management group, subscription, or resource group). Here are the steps to create a custom Azure policy:\n\n### Steps to Create a Custom Azure Policy\n\n1. **Define the Policy Rule**:\n   - You need to create a policy definition using JSON format. This includes defining the `if` condition (the rule) and the `then` action (the effect).\n   - Example of a simple policy that denies the creation of virtual machines in a specific location:\n     ```json\n     {\n       \"properties\": {\n         \"displayName\": \"Deny VM creation in a specific location\",\n         \"policyType\": \"Custom\",\n         \"mode\": \"Indexed\",\n         \"policyRule\": {\n           \"if\": {\n             \"allOf\": [\n               {\n                 \"field\": \"type\",\n                 \"equals\": \"Microsoft.Compute/virtualMachines\"\n               },\n               {\n                 \"field\": \"location\",\n                 \"equals\": \"eastus\"\n               }\n             ]\n           },\n           \"then\": {\n             \"effect\": \"deny\"\n           }\n         }\n       }\n     }\n     ```\n\n2. **Create the Policy in Azure**:\n   - You can create your policy definition in the Azure Portal or by using Azure CLI or PowerShell.\n   - **Azure Portal**:\n     - Go to the Azure Portal.\n     - Search for and select \"Policy\".\n     - Click on \"Definitions\" and then \"Policy definitions\".\n     - Click \" + Policy definition\" to create a new policy.\n     - Paste your JSON definition in the editor.\n     - Fill in the required fields like \"Display Name\" and \"Policy Type\".\n     - Click \"Save\" to create the policy.\n\n3. **Assign the Policy**:\n   - After the policy is created, you need to assign it to a specific scope.\n   - Go to the \"Assignments\" section in the Policy service.\n   - Click \"Assign policy\".\n   - Choose the policy you created from the dropdown.\n   - Specify the scope (subscription or resource group) where this policy should apply.\n   - Optionally, configure any parameters you've defined in your policy.\n   - Click \"Review + create\" and then \"Create\" to apply the policy assignment.\n\n### Useful Links and Documentation\n\n- **Azure Policy Overview**: [Azure Policy Overview](https://docs.microsoft.com/en-us/azure/governance/policy/overview)\n- **Create a Custom Policy Definition**: [Create a custom policy definition](https://docs.microsoft.com/en-us/azure/governance/policy/create-policy-definition)\n- **Assign a Policy**: [Assigning a Policy](https://docs.microsoft.com/en-us/azure/governance/policy/assign-policy)\n- **Azure Policy JSON Structure**: [Policy rule structure](https://docs.microsoft.com/en-us/azure/governance/policy/concepts/policy-definition#policy-definition-structure)\n\nBy following these steps and utilizing the provided resources, you can create and manage custom Azure policies effectively. If you need further customization or more complex policies, refer to the Azure documentation for more advanced examples and capabilities.\n",
+          "learn_citations": [
+            {
+              "url": "https://docs.microsoft.com/en-us/azure/governance/policy/overview)",
+              "domain": "learn.microsoft.com",
+              "title": "Overview)"
+            },
+            {
+              "url": "https://docs.microsoft.com/en-us/azure/governance/policy/create-policy-definition)",
+              "domain": "learn.microsoft.com",
+              "title": "Create Policy Definition)"
+            },
+            {
+              "url": "https://docs.microsoft.com/en-us/azure/governance/policy/assign-policy)",
+              "domain": "learn.microsoft.com",
+              "title": "Assign Policy)"
+            },
+            {
+              "url": "https://docs.microsoft.com/en-us/azure/governance/policy/concepts/policy-definition",
+              "domain": "learn.microsoft.com",
+              "title": "Policy Definition"
+            }
+          ],
+          "other_citations": [],
+          "citation_count": {
+            "learn": 4,
+            "other": 0,
+            "total": 4
+          }
+        },
+        "Gemini": {
+          "model": "gemini-auto",
+          "response_text": "Of course. Here is a comprehensive guide on how to create a custom Azure Policy, complete with explanations of the core components, step-by-step instructions for different methods, a practical example, and official Microsoft documentation links.\n\n### Introduction: What is a Custom Azure Policy?\n\nAzure Policy is a service in Azure that you use to create, assign, and manage policies. These policies enforce different rules and effects over your resources, so those resources stay compliant with your",
+          "learn_citations": [],
+          "other_citations": [],
+          "citation_count": {
+            "learn": 0,
+            "other": 0,
+            "total": 0
+          }
+        },
+        "Perplexity": {
+          "model": "llama-3.1-sonar-small-128k-online",
+          "response_text": "API key not configured or requests not available",
+          "learn_citations": [],
+          "other_citations": [],
+          "citation_count": {
+            "learn": 0,
+            "other": 0,
+            "total": 0
+          }
+        }
+      }
+    },
+    {
+      "prompt_id": "009",
+      "prompt_text": "Why is my Azure Storage account showing throttling errors?",
+      "category": "troubleshooting",
+      "providers": {
+        "ChatGPT": {
+          "model": "gpt-4-turbo",
+          "response_text": "Azure Storage accounts can show throttling errors for several reasons, primarily related to exceeding service limits or quota thresholds. Here are some common causes and solutions for throttling errors in Azure Storage:\n\n### Common Causes of Throttling Errors\n\n1. **Request Rate Limits**: Azure Storage accounts have limits on the number of requests that can be made per second. If you exceed these limits, you may see throttling errors (HTTP status codes like 429).\n\n2. **Transaction Count**: Each Azure Storage service has specific limits on the maximum transactions per second. For example, Azure Blob Storage, Queue Storage, and Table Storage all have different transaction limits.\n\n3. **Concurrent Connections**: If too many connections are made to the storage account simultaneously, this can also result in throttling.\n\n4. **Size of Requests**: Large requests can take more time and resources, potentially contributing to throttling if they continue to exceed limits.\n\n5. **Uneven Distribution of Load**: Accessing the same partition or performing too many transactions on a single resource can lead to throttling. \n\n### Solutions to Throttling Errors\n\n1. **Implement Retry Logic**: Azure SDKs often include built-in retry policies that automatically handle throttling errors. For manual implementation, you can utilize exponential backoff strategies for retries.\n\n2. **Optimize Your Storage Requests**: Review your application’s access patterns and optimize them. Instead of making multiple small requests, try to bundle requests if possible.\n\n3. **Distribute Workloads**: If you notice that your workloads are unevenly distributed, consider using different partitions or accounts to balance the load.\n\n4. **Use Premium Storage**: For workloads that require high performance, consider using Premium (SSD) storage solutions, which have higher limits compared to standard storage.\n\n5. **Monitor Storage Metrics**: Utilize Azure Monitor and Azure Storage metrics to check your account’s performance, request counts, and throttling incidents. This can provide insights into when you're approaching limits.\n\n### Documentation and Further Reading\n\n- **Azure Storage Throttling**: This article explains the throttling behavior of Azure Storage and provides recommendations for handling throttling scenarios:  \n  [Throttling in Azure Storage](https://learn.microsoft.com/en-us/rest/api/storageservices/throttling-in-azure-storage)\n\n- **Optimization Guidelines**: Review best practices for optimizing applications that access Azure Storage:  \n  [Best Practices for Azure Storage](https://learn.microsoft.com/en-us/azure/storage/common/storage-best-practices)\n\n- **Monitoring Azure Storage**: Learn how to monitor your Azure Storage account’s performance and diagnose issues:  \n  [Monitor Azure Storage](https://learn.microsoft.com/en-us/azure/storage/common/storage-monitoring-overview)\n\nUnderstanding these aspects of Azure Storage can help you identify and mitigate throttling issues effectively. If you continue to have problems, consider reaching out to Azure Support for more specific assistance.",
+          "learn_citations": [
+            {
+              "url": "https://learn.microsoft.com/en-us/rest/api/storageservices/throttling-in-azure-storage)",
+              "domain": "learn.microsoft.com",
+              "title": "Throttling In Azure Storage)"
+            },
+            {
+              "url": "https://learn.microsoft.com/en-us/azure/storage/common/storage-best-practices)",
+              "domain": "learn.microsoft.com",
+              "title": "Storage Best Practices)"
+            },
+            {
+              "url": "https://learn.microsoft.com/en-us/azure/storage/common/storage-monitoring-overview)",
+              "domain": "learn.microsoft.com",
+              "title": "Storage Monitoring Overview)"
+            }
+          ],
+          "other_citations": [],
+          "citation_count": {
+            "learn": 3,
+            "other": 0,
+            "total": 3
+          }
+        },
+        "Gemini": {
+          "model": "gemini-auto",
+          "response_text": "Of course. Here is a comprehensive answer explaining why your Azure Storage account might be showing throttling errors, how to diagnose the issue, and how to resolve it, complete with official Microsoft documentation links.\n\n---\n\n### Comprehensive Answer: Understanding and Resolving Azure Storage Throttling\n\nThrottling in Azure Storage is not a failure but a built-in",
+          "learn_citations": [],
+          "other_citations": [],
+          "citation_count": {
+            "learn": 0,
+            "other": 0,
+            "total": 0
+          }
+        },
+        "Perplexity": {
+          "model": "llama-3.1-sonar-small-128k-online",
+          "response_text": "API key not configured or requests not available",
+          "learn_citations": [],
+          "other_citations": [],
+          "citation_count": {
+            "learn": 0,
+            "other": 0,
+            "total": 0
+          }
+        }
+      }
+    },
+    {
+      "prompt_id": "010",
+      "prompt_text": "Azure SQL Database vs Azure SQL Managed Instance differences?",
+      "category": "comparison",
+      "providers": {
+        "ChatGPT": {
+          "model": "gpt-4-turbo",
+          "response_text": "Azure SQL Database and Azure SQL Managed Instance are both cloud-based database services offered by Microsoft Azure, but they cater to different needs and use cases. Here are the key differences between the two:\n\n### 1. **Service Model**\n- **Azure SQL Database**: It is a database-as-a-service (DBaaS) that provides single databases or elastic pools for multiple databases. It is designed for cloud-native applications and can scale on-demand.\n- **Azure SQL Managed Instance**: This service is also a DBaaS but is designed to provide a full SQL Server instance in the cloud, with a higher compatibility level for SQL Server features. Managed Instance is tailored for migrating on-premises SQL Server workloads to Azure with minimal changes.\n\n### 2. **Compatibility**\n- **Azure SQL Database**: It offers a subset of the SQL Server features and has some differences in compatibility, especially for advanced features like SQL Server Agent, cross-database queries, and certain replication features.\n- **Azure SQL Managed Instance**: It maintains a higher compatibility with SQL Server, including support for features such as cross-database transactions, SQL Server Agent, DB Mail, and CLR integration. It's suitable for applications that require a near-complete SQL Server feature set.\n\n### 3. **Deployment**\n- **Azure SQL Database**: Ideal for modern applications that need quick deployment and agility. It uses a multi-tenant architecture which can affect certain performance characteristics.\n- **Azure SQL Managed Instance**: Uses a single-tenant architecture, which makes it closer to a traditional SQL Server instance. It allows more control over the environment and configuration.\n\n### 4. **Scaling**\n- **Azure SQL Database**: Provides elastic scaling options with easy horizontal scaling, making it suitable for workloads with variable resource demands.\n- **Azure SQL Managed Instance**: Offers more traditional vertical scaling options, where the instance resources are scaled up or down, which can be more suitable for steady workloads.\n\n### 5. **Pricing**\n- **Azure SQL Database**: Pricing is based on the DTU (Database Transaction Unit) model or vCore model depending on the service tier you choose. It is typically more cost-effective for smaller or less demanding applications.\n- **Azure SQL Managed Instance**: Pricing is generally higher because it offers more features and capabilities, suitable for enterprise workloads and applications migrating from on-premises.\n\n### 6. **Deployment Options**\n- **Azure SQL Database**: It primarily offers a single database model or elastic pools.\n- **Azure SQL Managed Instance**: It allows for instances with multiple databases, supporting scenarios that require higher levels of resource isolation and management.\n\n### References:\n- Microsoft Documentation on [Azure SQL Database](https://docs.microsoft.com/en-us/azure/azure-sql/database/) and [Azure SQL Managed Instance](https://docs.microsoft.com/en-us/azure/azure-sql/managed-instance/).\n- Comparison article highlighting the differences between [Azure SQL Database and Azure SQL Managed Instance](https://docs.microsoft.com/en-us/azure/azure-sql/managed-instance/sql-managed-instance-vs-sql-database).\n\nThese references will provide further detailed insights and are also valuable for understanding specific capabilities and best practices associated with each service.",
+          "learn_citations": [
+            {
+              "url": "https://docs.microsoft.com/en-us/azure/azure-sql/database/)",
+              "domain": "learn.microsoft.com",
+              "title": ")"
+            },
+            {
+              "url": "https://docs.microsoft.com/en-us/azure/azure-sql/managed-instance/).",
+              "domain": "learn.microsoft.com",
+              "title": ")."
+            },
+            {
+              "url": "https://docs.microsoft.com/en-us/azure/azure-sql/managed-instance/sql-managed-instance-vs-sql-database).",
+              "domain": "learn.microsoft.com",
+              "title": "Sql Managed Instance Vs Sql Database)."
+            }
+          ],
+          "other_citations": [],
+          "citation_count": {
+            "learn": 3,
+            "other": 0,
+            "total": 3
+          }
+        },
+        "Gemini": {
+          "model": "gemini-auto",
+          "response_text": "Of course. Here is a comprehensive answer detailing the differences between Azure SQL Database and Azure SQL Managed Instance, complete with specific citations to official Microsoft documentation.\n\n---\n\n### Introduction: The PaaS Spectrum\n\nBoth Azure SQL Database and Azure SQL Managed Instance are fully managed Platform as a Service (PaaS) offerings in Azure. They handle administrative tasks like patching, backups, and high availability, allowing you to focus on your data and applications. However, they are designed for different use cases and sit at different points on the PaaS spectrum.\n\n*   **Azure SQL Database:** This is a \"database-as-a-",
+          "learn_citations": [],
+          "other_citations": [],
+          "citation_count": {
+            "learn": 0,
+            "other": 0,
+            "total": 0
+          }
+        },
+        "Perplexity": {
+          "model": "llama-3.1-sonar-small-128k-online",
+          "response_text": "API key not configured or requests not available",
+          "learn_citations": [],
+          "other_citations": [],
+          "citation_count": {
+            "learn": 0,
+            "other": 0,
+            "total": 0
+          }
+        }
+      }
+    }
+  ]
+}
